@@ -1,8 +1,8 @@
 .\hal_template\control_task.o: ..\Application\Tasks\Src\Control_Task.c
 .\hal_template\control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 .\hal_template\control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-.\hal_template\control_task.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-.\hal_template\control_task.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+.\hal_template\control_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stddef.h
+.\hal_template\control_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
 .\hal_template\control_task.o: ../Core/Inc/FreeRTOSConfig.h
 .\hal_template\control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\hal_template\control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
@@ -16,13 +16,15 @@
 .\hal_template\control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 .\hal_template\control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 .\hal_template\control_task.o: ../Application/Tasks/Inc/Control_Task.h
-.\hal_template\control_task.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdbool.h
+.\hal_template\control_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdbool.h
 .\hal_template\control_task.o: ../Application/Tasks/Inc/INS_Task.h
 .\hal_template\control_task.o: ../Application/Tasks/Inc/vision_task.h
 .\hal_template\control_task.o: ../Application/Tasks/Inc/config.h
-.\hal_template\control_task.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
-.\hal_template\control_task.o: D:\MDK5\ARM\ARMCC\Bin\..\include\string.h
-.\hal_template\control_task.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h
+.\hal_template\control_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
+.\hal_template\control_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
+.\hal_template\control_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\math.h
+.\hal_template\control_task.o: ../Application/API/Inc/api_trajectory.h
+.\hal_template\control_task.o: ../Components/Device/Inc/minipc.h
 .\hal_template\control_task.o: ../Components/Device/Inc/remote_control.h
 .\hal_template\control_task.o: ../Components/Device/Inc/motor.h
 .\hal_template\control_task.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
@@ -61,3 +63,5 @@
 .\hal_template\control_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 .\hal_template\control_task.o: ../Components/Controller/Inc/pid.h
 .\hal_template\control_task.o: ../Components/Device/Inc/referee_info.h
+.\hal_template\control_task.o: ../Core/Inc/tim.h
+.\hal_template\control_task.o: ../Core/Inc/main.h

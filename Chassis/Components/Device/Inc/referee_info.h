@@ -37,33 +37,45 @@
 // #define GAME_STATUS_ID                    0x0001U  /*!< game status data */
 // #define GAME_RESULT_ID                    0x0002U  /*!< game result data */
 // #define GAME_ROBOTHP_ID                   0x0003U  /*!< robot HP data */
-// #define DART_STATUS_ID                    0x0004U  /*!< dart robot shoot status */
 
 // #define EVENE_DATA_ID                     0x0101U  /*!< site event data */
 // #define SUPPLY_ACTION_ID                  0x0102U  /*!< supply station action data */
-// #define SUPPLY_BOOKING_ID                 0x0103U  /*!< booking supply data */
-// #define REFEREE_WARNING_ID                0x0104U  /*!< referee warning data */
-// #define DART_REMAINING_TIME_ID            0x0105U  /*!< dart shoot countdown */
+
+//#define REFEREE_WARNING_ID                0x0104U  /*!< referee warning data */
+//#define DART_INFO_ID                     0x0105U  /*!< dart shoot data */
 
 #define ROBOT_STATUS_ID                   0x0201U  /*!< robot status data */
-#define REAL_POWER_HEAT_ID                0x0202U  /*!< real power heat data */
-// #define ROBOT_POSITION_ID                 0x0203U  /*!< robot position data */
+
+#define POWER_HEAT_ID                     0x0202U  /*!< real power heat data */
+
+//#define ROBOT_POSITION_ID                 0x0203U  /*!< robot position data */
 // #define ROBOT_BUFF_ID                     0x0204U  /*!< robot buff data */
-// #define AERIAL_ENERGY_ID                  0x0205U  /*!< aerial robot energy data */
+// #define AIR_SUPPORT_ID                  0x0205U  /*!< aerial robot energy data */
 // #define ROBOT_HURT_ID                     0x0206U  /*!< robot hurt data */
-#define REAL_SHOOT_DATA_ID                0x0207U  /*!< real robot shoot data */
-// #define BULLET_REMAINING_ID               0x0208U  /*!< bullet remain data */
+#define SHOOT_DATA_ID                       0x0207U  /*!< real robo t shoot data */
+//#define PROJECTILE_ALLOWANCE_ID             0x0208U  /*!< bullet remain data */
+//                
 //#define RFID_STATUS_ID                    0x0209U  /*!< RFID status data */
-// #define DART_CLIENT_CMD_ID                0x020AU  /*!< DART Client cmd data */
-// #define GROUND_POSITION_ID                0x020BU  /*!< ground robot position */
+//#define DART_CLIENT_CMD_ID                0x020AU  /*!< DART Client cmd data */
+// #define GROUND_ROBOT_POSITION_ID                0x020BU  /*!< ground robot position */
+
+//#define RADAR_MARAKING_ID                  0x020CU     /*!< Radar marking progress*/
+//#define SENTRY_INFO_ID          0X020DU    /*!< SENTRY make autonomous decisions*/
+//#define RADAR_INFO_ID             0X020EU   /*!< RADAR make autonomous decisions*/
+
+
+
+
+
 
 #define INTERACTIVE_DATA_ID               0x0301U  /*!< robot interactive data */
 #define CUSTOM_CONTROLLER_ID              0x0302U  /*!< custom controller data */
 #define MINIMAP_INTERACTIVE_ID            0x0303U  /*!< mini map interactive data */
 #define KEYMOUSE_INFO_ID                  0x0304U  /*!< key mouse data according the image transmission */
 #define MINIMAP_RECV_ID                   0x0305U  /*!< mini map receive data */
+#define CUSTOM_CONTROLLER_INTERACTIVE_ID  0x0306U  /*!< mini map receive data */
 #define MAP_SENTRY_DATA_ID                0x0307U  /*!< mini map sentry path */
-
+#define MAP_ROBOT_DATA_ID                 0x0308U  /*!< mini map robot  path */
 /**
  * @brief Robot id
  */
@@ -150,8 +162,9 @@ typedef struct
 	uint8_t game_type : 4;	        
 	uint8_t game_progress : 4;	    /*!< the progress of game */
 	uint16_t stage_remain_time;	    /*!< remain time of real progress */
+  uint64_t SyncTimeStamp;
   // uint64_t SyncTimeStamp;         /*!< unix time */
-} ext_game_status_t;
+} game_status_t;
 
 /**
  * @brief typedef structure that contains the information of game result, id: 0x0002U
@@ -165,7 +178,7 @@ typedef struct
             2:Blue wins
    */
  uint8_t winner;
-} ext_game_result_t;
+} game_result_t;
 
 /**
  * @brief typedef structure that contains the information of robot HP data, id: 0x0003U
@@ -189,21 +202,7 @@ typedef struct
   uint16_t blue_7_robot_HP;   /*!< Blue Sentry HP */
   uint16_t blue_outpost_HP;   /*!< Blue Outpost HP */
   uint16_t blue_base_HP;      /*!< Blue Base HP */
-} ext_game_robot_HP_t;
-
-/**
- * @brief typedef structure that contains the information of dart status, id: 0x0004U
- */
-typedef struct
-{
-  /**
-   * @brief dart belong
-   *        0: red
-   *        1: blue
-   */
-  uint8_t dart_belong;
-  uint16_t stage_remaining_time;
-}ext_dart_status_t;
+} game_robot_HP_t;
 
 /**
  * @brief typedef structure that contains the information of site event data, id: 0x0101U
@@ -212,42 +211,45 @@ typedef union
 {
     /**
      * @brief the event of site
-              bit 0:  status of supply station 1 recovery buff point, 1 is occupied
-              bit 1:  status of supply station 2 recovery buff point, 1 is occupied
-              bit 2:  status of supply station 3 recovery buff point, 1 is occupied
+              bit 0:  status of supply station out recovery buff point, 1 is occupied
+              bit 1:  status of supply station in recovery buff point, 1 is occupied
+              bit 2:  status of supply Center gain point, 1 is occupied （Just RMUL）
               bit 3:  status of energy buff attack point, 1 is occupied
               bit 4:  status of little energy buff, 1 is activating
               bit 5:  status of large energy buff, 1 is activating
-              bit 6:  status of R2/B2 Ring Heights buff, 1 is occupied
-              bit 7:  status of R3/B3 Trapezoidal Heights buff, 1 is occupied
-              bit 8:  status of R4/B4 Trapezoidal Heights buff, 1 is occupied
-              bit 9:  status of base shield, 1 is hold
-              bit 10: status of outpost, 1 is survived
-              bit 11-31: reserved
+              bit 6-7:  status of Ring Heights land, 1 is our_side_occupied / 2  is opposite_side_occupied
+              bit 8-9: status of R3 Trapezoidal Heights land,  1 is our side occupied / 2  is opposite side occupied
+              bit 10-11  status of R4 Trapezoidal Heights land,  1 is our side occupied / 2  is opposite side occupied
+              bit 12-18 status of Base virtual shield value Percentage of remaining  
+              bit 19-27: The time when the dart last hit one's own outpost or base
+              bit 28-29: The last time a dart hits a specific target at one's own outpost or base, 1 is outpost 2 is base fixed target, 3 is random target
+              bit 30-31:  status of Center gain point , 0 is no occupied, 1 is our side occupied 2 is opposite side occupied （Just RMUL）
+                        
     */
-    uint32_t event_type;
+    uint32_t  event_data;
 
-    uint32_t first_recovery_point : 1;
-    uint32_t second_recovery_point : 1;
-    uint32_t third_recovery_point : 1;
-    uint32_t energy_buff_attack : 1;
-    uint32_t little_energy_buff : 1;
-    uint32_t large_energy_buff : 1;
-    uint32_t ring_Heights_2_buff : 1;
-    uint32_t trapezoidal_Heights_3_buff : 1;
-    uint32_t trapezoidal_Heights_4_buff : 1;
-    uint32_t base_shield : 1;
-    uint32_t outpost_status : 1;
-    uint32_t reserved : 19; 
+    uint32_t Out_recovery_point : 1;
+    uint32_t In_recovery_point : 1;
+    uint32_t recovery_point_RMUL : 1;
+    uint32_t Energy_buff_attack_point : 1;
+    uint32_t Little_energy_buff : 1;
+    uint32_t Large_energy_buff : 1;
+    uint32_t Ring_Heights_land : 2;
+    uint32_t R3_Trapezoidal_Heights_land : 2;
+    uint32_t R4_Trapezoidal_Heights_land : 2;
+    uint32_t Base_shield_remaining_percentage: 7;
+    uint32_t Dart_last_hit_time : 9;
+    uint32_t Dart_last_hit_Target : 2;
+    uint32_t Center_gain_point_situation_RMUL : 2; 
 
-} ext_event_data_t;
+} event_data_t;
 
 /**
  * @brief typedef structure that contains the information of supply station activation, id: 0x0102U
  */
 typedef struct
 {
-  uint8_t supply_projectile_id;   /*!< supply station id */
+  uint8_t reserved;   /*!< supply station id */
   /**
    * @brief supply robot id
    *             0: robot none
@@ -267,30 +269,57 @@ typedef struct
    */
   uint8_t supply_projectile_step;
   uint8_t supply_projectile_num;  /*!< the number of supply */
-} ext_supply_projectile_action_t;
+} supply_projectile_action_t;
 
 /**
  * @brief typedef structure that contains the information of referee warning, id: 0x0104U
  */
 typedef struct
 {
+   uint8_t level;
   /**
    * @brief warning level
    *        1: yellow card
    *        2: red card
    *        3: negative
    */
-  uint8_t level;
-  uint8_t foul_robot_id; /*!< warning robot id */
-} ext_referee_warning_t;
-
+ 
+  uint8_t offending_robot_id;
+    /**
+   * @brief warning robot id
+   *             0: robot none
+   *             1: red hero
+   *             2: red engineer
+   *         3/4/5: red infantry
+   *           101: blue hero
+   *           102: blue engineer
+   *   103/104/105: blue infantry
+   */
+  uint8_t count; /*!<The number of violations of the corresponding penalty level for the last violation robot that was penalized on our side.*/
+} referee_warning_t;
 /**
- * @brief typedef structure that contains the information of dart remaining time, id: 0x0105U
+ * @brief typedef structure that contains the information of dart, id: 0x0105U
  */
-typedef struct
+typedef  struct
 {
-  uint8_t dart_remaining_time;    /*!< 15s countdown */
-} ext_dart_remaining_time_t;
+ 
+ uint8_t dart_remaining_time;
+ 
+ uint16_t dart_info;
+  /**
+   * @brief dart_info
+   *       bit 0-1 The latest target hit by our own dart.
+   *       bit 2-4 The  hit count of the opponent's recently hit targets.
+   *       bit 5-6 The selected target of the dart at this time, 1 is outpost 2 is base fixed target, 3 is random target;
+   *       bit 7-15 reserved
+   */
+ uint16_t  Lastest_target_hit : 2;
+ uint16_t  Hit_count : 3;
+ uint16_t  Selected_target : 2 ; 
+ uint16_t  reserved : 9 ;
+}dart_info_t;
+
+
 
 /**
  * @brief typedef structure that contains the information of robot status, id: 0x0201U
@@ -317,41 +346,31 @@ typedef struct
    */
   uint8_t robot_id;
   uint8_t robot_level;
-  uint16_t remain_HP;
-  uint16_t max_HP;
+  uint16_t current_HP;
+  uint16_t maximum_HP;
 
-  uint16_t shooter_id1_17mm_cooling_rate;
-  uint16_t shooter_id1_17mm_cooling_limit;
-  uint16_t shooter_id1_17mm_speed_limit;
-
-  uint16_t shooter_id2_17mm_cooling_rate;
-  uint16_t shooter_id2_17mm_cooling_limit;
-  uint16_t shooter_id2_17mm_speed_limit;
-
-  uint16_t shooter_id1_42mm_cooling_rate;
-  uint16_t shooter_id1_42mm_cooling_limit;
-  uint16_t shooter_id1_42mm_speed_limit;
-
+  uint16_t shooter_barrel_cooling_value;
+  uint16_t shooter_barrel_heat_limit;
   uint16_t chassis_power_limit;
 
   uint8_t mains_power_gimbal_output : 1;
   uint8_t mains_power_chassis_output : 1;
   uint8_t mains_power_shooter_output : 1;
-} ext_game_robot_status_t;
+} robot_status_t;
 
 /**
  * @brief typedef structure that contains the information of power heat data, id: 0x0202U
  */
 typedef struct
 {
-  uint16_t chassis_volt;
+  uint16_t chassis_voltage;
   uint16_t chassis_current;
   float chassis_power;
-  uint16_t chassis_power_buffer;
-  uint16_t shooter_id1_17mm_cooling_heat;
-  uint16_t shooter_id2_17mm_cooling_heat;
-  uint16_t shooter_id1_42mm_cooling_heat;
-} ext_power_heat_data_t;
+  uint16_t buffer_energy;
+  uint16_t shooter_17mm_1_barrel_heat;
+  uint16_t shooter_17mm_2_barrel_heat;
+  uint16_t shooter_42mm_barrel_heat;
+} power_heat_data_t;
 
 /**
  * @brief typedef structure that contains the information of robot position data, id: 0x0203U
@@ -360,41 +379,29 @@ typedef struct
 {
   float x;    /*!< position x coordinate, unit: m */
   float y;    /*!< position y coordinate, unit: m */
-  float z;    /*!< position z coordinate, unit: m */
-  float yaw;  /*!< Position muzzle, unit: degrees */
-} ext_robot_position_t;
+  float  angle;  /*!< Position muzzle, unit: degrees */
+} robot_pos_t;
 
 /**
  * @brief typedef structure that contains the information of robot buff data, id: 0x0204U
  */
 typedef union
 {
-    /**
-     * @brief robot buff data
-     *        bit 0: robot HP recovery status
-     *        bit 1: muzzle cooling quicken
-     *        bit 2: robot defense bonus
-     *        bit 3: robot Attack bonus
-     *        bit 4-8: reserved
-     */
-    uint8_t power_rune_buff;
-    uint8_t HP_recovery:1;
-    uint8_t cooling_quickly:1;
-    uint8_t defense_bonus:1;
-    uint8_t attack_bonus:1; 
-    uint8_t reserved : 4; 
-}ext_robot_buff_t;
+  uint8_t recovery_buff;
+  uint8_t cooling_buff;
+  uint8_t defence_buff;
+  uint8_t vulnerability_buff;
+  uint16_t attack_buff;
+}buff_t;
 
 /**
  * @brief typedef structure that contains the information of aerial robot energy, id: 0x0205U
  */
-typedef struct
+typedef  struct
 {
-  /**
-   * @brief remaining attack time, 30s Countdown
-   */
-  uint8_t attack_time;
-} aerial_robot_energy_t;
+ uint8_t airforce_status;
+ uint8_t time_remain;
+}air_support_data_t;
 
 /**
  * @brief typedef structure that contains the information of robot hurt, id: 0x0206U
@@ -411,41 +418,29 @@ typedef struct
    *        4: over chassis power
    *        5: armor bump
    */
- uint8_t hurt_type : 4;
-} ext_robot_hurt_t;
+ uint8_t HP_deduction_reason : 4;
+} hurt_data_t;
 
 /**
  * @brief typedef structure that contains the information of real shoot data, id: 0x0207U
  */
-typedef struct
+typedef  struct
 {
-  /**
-   * @brief bullet type
-   *        1: 17mm
-   *        2: 42mm
-   */
-  uint8_t bullet_type;
-  /**
-   * @brief shooter id
-   *        1: 1 17mm shooter
-   *        2: 2 17mm shooter
-   *        3: 42mm shooter
-   */
-  uint8_t shooter_id;
-
-  uint8_t bullet_freq; /*!< bullet frequence */
-  float bullet_speed; /*!< bullet speed */
-} ext_shoot_data_t;
+ uint8_t bullet_type;
+ uint8_t shooter_number;
+ uint8_t launching_frequency;
+ float initial_speed;
+}shoot_data_t;
 
 /**
  * @brief typedef structure that contains the information of bullet remaining number, id: 0x0208U
  */
-typedef struct
+typedef  struct
 {
-  uint16_t bullet_remaining_num_17mm;
-  uint16_t bullet_remaining_num_42mm;
-  uint16_t coin_remaining_num;
-} ext_bullet_remaining_t;
+ uint16_t projectile_allowance_17mm;
+ uint16_t projectile_allowance_42mm;
+ uint16_t remaining_gold_coin;
+}projectile_allowance_t;;
 
 /**
  * @brief typedef structure that contains the information of RFID status, id: 0x0209U
@@ -464,37 +459,39 @@ typedef union
             bit 8-31: reserved 
    */
  uint32_t rfid_status;
- uint32_t basebuff_status : 1;
- uint32_t heightsbuff_status : 1;
- uint32_t energyhitbuff_status : 1;
- uint32_t flyslopebuff_status : 1;
- uint32_t outpostbuff_status : 1;
- uint32_t HPrecoverybuff_status : 1;
- uint32_t rescuecardbuff_status : 1;
- uint32_t reserved : 25;
-} ext_rfid_status_t;
+ uint32_t BaseBuff_status : 1;
+ uint32_t Our_Ring_HeightBuff_status : 1;
+ uint32_t Opposite_Ring_HeightBuff_status : 1;
+ uint32_t Our_R3_Trapezoidal_HeightsBuff_status : 1;
+ uint32_t Opposite_R3_Trapezoidal_HeightsBuff_status : 1;
+ uint32_t Our_R4_Trapezoidal_HeightsBuff_status : 1;
+ uint32_t Opposite_R4_Trapezoidal_HeightsBuff_status : 1;
+ uint32_t EnergyhitBuff_status : 1;
+ uint32_t Our_Front_FlyslopebBuff_status : 1;
+ uint32_t Our_Before_FlyslopebBuff_status : 1;
+ uint32_t Opposite_Front_FlyslopebBuff_status : 1;
+ uint32_t Opposite_Before_FlyslopebBuff_status : 1;
+ uint32_t OutpostBuff_status : 1;
+ uint32_t HPrecoveryBuff_status : 1;
+ uint32_t Our_Sentry_Patrol_status : 1;
+ uint32_t Opposite_Sentry_Patrol_status : 1;
+ uint32_t Our_Large_Resource_IslandBuff_status : 1 ;
+ uint32_t Opposite_Large_Resource_IslandBuff_status : 1;
+ uint32_t Our_Exchange_status : 1;
+ uint32_t Center_Buff_point_status : 1;
+ uint32_t reserved : 12;
+} rfid_status_t;
 
 /**
  * @brief typedef structure that contains the information of dart client data, id: 0x020AU
  */
-typedef struct
+typedef  struct
 {
-  /**
-   * @brief dart launch status
-   *        1: closed
-   *        2: opening or closing
-   *        3: opened
-   */
-  uint8_t dart_launch_opening_status;
-  /**
-   * @brief dart attack target
-   *        0: outpost
-   *        1: base
-   */
-  uint8_t  dart_attack_target;
-  uint16_t target_change_time;
-  uint16_t operate_launch_cmd_time;
-} ext_dart_client_cmd_t;
+ uint8_t dart_launch_opening_status;
+ uint8_t reserved;
+ uint16_t target_change_time;
+ uint16_t latest_launch_cmd_time;
+}dart_client_cmd_t;
 
 /**
  * @brief typedef structure that contains the information of robot position in mimi map, id: 0x020BU
@@ -525,34 +522,37 @@ typedef struct
   uint8_t mark_standard_5_progress;
   uint8_t mark_sentry_progress;
 }radar_mark_data_t;
-
-///**
-// * @brief typedef structure that contains the information of robot interactive data, id: 0x0301U
-// */
-//typedef struct
-//{
-//  /**
-//   * @brief data cmd id
-//   *        0x0200-0x02ff: robot interactive
-//   *        0x0100: client delete graph
-//   *        0x0101: client draw one graph
-//   *        0x0102: client draw two graph
-//   *        0x0103: client draw five graph
-//   *        0x0104: client draw seven graph
-//   *        0x0110: client draw char graph 
-//  */ 
-//  uint16_t data_cmd_id;
-//  uint16_t sender_ID;
-//  uint16_t receiver_ID;
-//}ext_student_interactive_header_data_t;
-
+typedef  struct
+{
+ uint32_t sentry_info;
+ uint32_t Sentry_Exchange_bullet : 11;
+ uint32_t Sentry_Remote_Exchange_bullet_count : 4;
+ uint32_t Sentry_Remote_Exchange_HP_count : 4;
+ uint32_t reserved : 13;
+} sentry_info_t;
+typedef  struct
+{
+ uint8_t radar_info;
+ uint8_t radar_double_damage_chance : 2;
+ uint8_t opposite_radar_double_damage : 1;
+ uint8_t reserved :5 ;  
+} radar_info_t;
+/**
+ * @brief typedef structure that contains the information of custom controller interactive, id: 0x0301U
+ */
+typedef struct{ 
+ uint16_t data_cmd_id;
+ uint16_t sender_id;
+ uint16_t receiver_id;
+ uint8_t user_data[113];
+}robot_interaction_data_t;
 /**
  * @brief typedef structure that contains the information of custom controller interactive, id: 0x0302U
  */
 typedef struct 
 {
   uint8_t data[30];
-} robot_interactive_data_t;
+} custom_robot_data_t;
 
 /**
  * @brief typedef structure that contains the information of client transmit data, id: 0x0303U
@@ -620,63 +620,85 @@ typedef struct
   uint16_t datalength;
   
 #ifdef GAME_STATUS_ID
-  ext_game_status_t game_status;
+  game_status_t game_status;
 #endif
+
+#ifdef GAME_RESULT_ID
+  game_result_t game_result;
+#endif
+
+#ifdef  GAME_ROBOTHP_ID
+	game_robot_HP_t game_robot_HP;
+#endif	
 	
 #ifdef EVENE_DATA_ID
-  ext_event_data_t site_event;
-#endif
-	
-#ifdef DART_REMAINING_TIME_ID
-  ext_dart_remaining_time_t dart_remaining;
-#endif
-	
-#ifdef DART_CLIENT_CMD_ID
-  ext_dart_client_cmd_t dart_client_cmd;
-#endif
-	
-#ifdef AERIAL_ENERGY_ID
-  aerial_robot_energy_t aerial_energy;
+  event_data_t event_data;
 #endif
 
-#ifdef GROUND_POSITION_ID
-  ground_robot_position_t ground_robot_positio;
+#ifdef SUPPLY_ACTION_ID   	
+  supply_projectile_action_t  supply_projectile_action;
 #endif
 
-#ifdef GAME_ROBOTHP_ID
-  ext_game_robot_HP_t robot_HP;
+#ifdef REFEREE_WARNING_ID
+    referee_warning_t referee_warning;
 #endif
-	
+
+#ifdef DART_INFO_ID
+  dart_info_t dart_info;
+#endif
+
 #ifdef ROBOT_STATUS_ID
-  ext_game_robot_status_t robot_status;
+  robot_status_t robot_status;
 #endif
 
-#ifdef REAL_POWER_HEAT_ID
-  ext_power_heat_data_t power_heat;
+#ifdef POWER_HEAT_ID
+  power_heat_data_t power_heat_data;
 #endif
 
 #ifdef ROBOT_POSITION_ID
-  ext_robot_position_t robot_position;
+  robot_pos_t  robot_pos;
 #endif
 
 #ifdef ROBOT_BUFF_ID
-  ext_robot_buff_t robot_buff;
+  buff_t  buff;
 #endif
 
+#ifdef AIR_SUPPORT_ID
+ air_support_data_t air_support_data;
+#endif
 #ifdef ROBOT_HURT_ID
-  ext_robot_hurt_t robot_hurt;
+  hurt_data_t  hurt_data;
 #endif
 
-#ifdef REAL_SHOOT_DATA_ID
-  ext_shoot_data_t shoot_data;
+#ifdef SHOOT_DATA_ID
+  shoot_data_t  shoot_data;
 #endif
 
-#ifdef BULLET_REMAINING_ID
-  ext_bullet_remaining_t bullet_remaining;
+#ifdef PROJECTILE_ALLOWANCE_ID
+  projectile_allowance_t projectile_allowance;
+#endif
+#ifdef  RFID_STATUS_ID
+    rfid_status_t rfid_status;
 #endif
 
-#ifdef RFID_STATUS_ID
-  ext_rfid_status_t RFID_Status;
+#ifdef DART_CLIENT_CMD_ID
+    dart_client_cmd_t  dart_client_cmd;
+#endif
+
+#ifdef GROUND_ROBOT_POSITION_ID
+    ground_robot_position_t  ground_robot_position;
+#endif 
+
+#ifdef RADAR_MARAKING_ID
+    radar_mark_data_t  radar_mark_data;
+#endif
+
+#ifdef SENTRY_INFO_ID
+    sentry_info_t  sentry_info;
+#endif
+
+#ifdef RADAR_INFO_ID
+    radar_info_t  radar_info;
 #endif
 }Referee_Info_TypeDef;
 

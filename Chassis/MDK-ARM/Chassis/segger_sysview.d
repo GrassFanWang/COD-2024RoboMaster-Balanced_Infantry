@@ -1,0 +1,13 @@
+.\chassis\segger_sysview.o: ..\SystemView\SEGGER\SEGGER_SYSVIEW.c
+.\chassis\segger_sysview.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
+.\chassis\segger_sysview.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
+.\chassis\segger_sysview.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdarg.h
+.\chassis\segger_sysview.o: ..\SystemView\SEGGER\SEGGER_SYSVIEW_Int.h
+.\chassis\segger_sysview.o: ..\SystemView\SEGGER\SEGGER_SYSVIEW.h
+.\chassis\segger_sysview.o: ..\SystemView\SEGGER\SEGGER.h
+.\chassis\segger_sysview.o: ..\SystemView\Config\Global.h
+.\chassis\segger_sysview.o: ..\SystemView\SEGGER\SEGGER_SYSVIEW_ConfDefaults.h
+.\chassis\segger_sysview.o: ..\SystemView\Config\SEGGER_SYSVIEW_Conf.h
+.\chassis\segger_sysview.o: ..\SystemView\Config\SEGGER_RTT_Conf.h
+.\chassis\segger_sysview.o: ..\SystemView\SEGGER\SEGGER_RTT.h
+.\chassis\segger_sysview.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h

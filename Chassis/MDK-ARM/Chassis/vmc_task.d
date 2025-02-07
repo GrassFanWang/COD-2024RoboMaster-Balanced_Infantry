@@ -1,6 +1,12 @@
 .\chassis\vmc_task.o: ..\Application\Tasks\Src\VMC_Task.c
 .\chassis\vmc_task.o: ../Application/Tasks/Inc/VMC_Task.h
 .\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
+.\chassis\vmc_task.o: ../Components/Algorithm/Inc/lpf.h
+.\chassis\vmc_task.o: ../Application/Tasks/Inc/config.h
+.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdbool.h
+.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
+.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
+.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\math.h
 .\chassis\vmc_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 .\chassis\vmc_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 .\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stddef.h
@@ -17,13 +23,8 @@
 .\chassis\vmc_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 .\chassis\vmc_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 .\chassis\vmc_task.o: ../Application/Tasks/Inc/Control_Task.h
-.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdbool.h
 .\chassis\vmc_task.o: ../Application/Tasks/Inc/INS_Task.h
 .\chassis\vmc_task.o: ../Components/Algorithm/Inc/ramp.h
-.\chassis\vmc_task.o: ../Application/Tasks/Inc/config.h
-.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
-.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
-.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\math.h
 .\chassis\vmc_task.o: ../Components/Controller/Inc/pid.h
 .\chassis\vmc_task.o: ../Components/Device/Inc/motor.h
 .\chassis\vmc_task.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
@@ -63,3 +64,6 @@
 .\chassis\vmc_task.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
 .\chassis\vmc_task.o: ../Drivers/CMSIS/Include/core_cm4.h
 .\chassis\vmc_task.o: ../Components/Device/Inc/remote_control.h
+.\chassis\vmc_task.o: ../Bsp/Inc/bsp_uart.h
+.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdio.h
+.\chassis\vmc_task.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdarg.h

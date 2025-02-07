@@ -1,11 +1,11 @@
---cpu=Cortex-M4.fp
+--cpu=Cortex-M4.fp.sp
 ".\hal_template\api_quaternion.o"
 ".\hal_template\api_trajectory.o"
 ".\hal_template\can_task.o"
 ".\hal_template\control_task.o"
 ".\hal_template\detect_task.o"
-".\hal_template\ins_task.o"
 ".\hal_template\vision_task.o"
+".\hal_template\ins_task.o"
 ".\hal_template\bsp_can.o"
 ".\hal_template\bsp_dwt.o"
 ".\hal_template\bsp_gpio.o"
@@ -69,6 +69,7 @@
 ".\hal_template\stm32f4xx_hal_tim_ex.o"
 ".\hal_template\stm32f4xx_hal_uart.o"
 "..\Middlewares\ST\ARM\DSP\Lib\arm_cortexM4lf_math.lib"
+"..\Middlewares\ST\ARM\DSP\Lib\arm_cortexM4l_math.lib"
 ".\hal_template\usb_device.o"
 ".\hal_template\usbd_desc.o"
 ".\hal_template\usbd_cdc_if.o"
@@ -78,6 +79,6 @@
 ".\hal_template\usbd_ioreq.o"
 ".\hal_template\usbd_cdc.o"
 --strict --scatter ".\HAL_Template\HAL_Template.sct"
---summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "HAL_Template.map" -o .\HAL_Template\HAL_Template.axf

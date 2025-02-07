@@ -102,6 +102,8 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+//	HAL_TIM_Base_Start(&htim1);
+//	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
 	MCU_Init();
   /* USER CODE END 2 */
 
@@ -110,6 +112,7 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
+
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */

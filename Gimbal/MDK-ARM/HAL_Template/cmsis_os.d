@@ -1,9 +1,9 @@
 .\hal_template\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
-.\hal_template\cmsis_os.o: D:\MDK5\ARM\ARMCC\Bin\..\include\string.h
+.\hal_template\cmsis_os.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
 .\hal_template\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 .\hal_template\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-.\hal_template\cmsis_os.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-.\hal_template\cmsis_os.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+.\hal_template\cmsis_os.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stddef.h
+.\hal_template\cmsis_os.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
 .\hal_template\cmsis_os.o: ../Core/Inc/FreeRTOSConfig.h
 .\hal_template\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\hal_template\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

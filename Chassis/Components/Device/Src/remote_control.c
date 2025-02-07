@@ -35,7 +35,7 @@ uint8_t SBUS_MultiRx_Buf[2][SBUS_RX_BUF_NUM];
 /**
  * @brief structure that contains the information of keyboard
  */
-static Remote_Pressed_Typedef KeyBoard_Info;
+ Remote_Pressed_Typedef KeyBoard_Info;
 
 /* Private function prototypes -----------------------------------------------*/
 /**
@@ -112,11 +112,7 @@ void Remote_Info_Update(uint32_t *StdId, uint8_t *rxBuf,Remote_Info_Typedef *rem
 	{
 		remote_ctrl->rc.ch[4] = -1*((uint8_t)(rxBuf[0] & 0x10U) >> 4);
 	}
-	
-	UI_Char.Fire = (uint8_t)(rxBuf[1] & 0x10U) >> 4;
-	UI_Char.Shooter_Mode = (uint8_t)(rxBuf[1] & 0x06U) >> 2;
-	UI_Char.Auto  = (uint8_t)(rxBuf[1] & 0x02U) >> 1;
-	UI_Char.Cover = (uint8_t)(rxBuf[1] & 0x01U);
+
 	
 	remote_ctrl->rc.ch[3] = (int16_t)rxBuf[2] << 8 | rxBuf[3];
 	remote_ctrl->rc.ch[2] = (int16_t)rxBuf[4] << 8 | rxBuf[5];
@@ -257,7 +253,66 @@ bool Key_W(void)
   }
   return res;
 }
+bool Key_A(void)
+{
+  bool res = false;
 
+  /* update the key status */
+  Key_Status_Update(&KeyBoard_Info.A,KeyBoard_A);
+
+  switch (KeyBoard_Info.A.Status)
+  {
+    case UP:
+    break;
+
+    case PRESS:
+    break;
+
+    case SHORT_DOWN:
+     res = true;
+    break;
+
+    case DOWN:
+     res = true;
+    break;
+
+    case RELAX:
+    break;
+
+    default:break;
+  }
+  return res;
+}
+bool Key_D(void)
+{
+  bool res = false;
+
+  /* update the key status */
+  Key_Status_Update(&KeyBoard_Info.D,KeyBoard_D);
+
+  switch (KeyBoard_Info.D.Status)
+  {
+    case UP:
+    break;
+
+    case PRESS:
+    break;
+
+    case SHORT_DOWN:
+     res = true;
+    break;
+
+    case DOWN:
+     res = true;
+    break;
+
+    case RELAX:
+    break;
+
+    default:break;
+  }
+  return res;
+}
 bool Key_S(void)
 {
   bool res = false;

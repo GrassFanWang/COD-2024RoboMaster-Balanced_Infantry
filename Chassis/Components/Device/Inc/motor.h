@@ -26,13 +26,13 @@
 /* Exported types ------------------------------------------------------------*/
 
 /**
- * @brief typedef enum that contains the usage for RMD Motor.
+ * @brief typedef enum that contains the usage for LK Motor.
  */
 typedef enum{
 	Left_Wheel,
 	Right_Wheel,
-  RMD_MOTOR_USAGE_NUM,
-}RMD_MOTOR_USAGE_e;
+  LK_MOTOR_USAGE_NUM,
+}LK_MOTOR_USAGE_e;
 
 
 /**
@@ -46,10 +46,10 @@ typedef enum{
 }DJI_MOTOR_USAGE_e;
 
 typedef enum{
-	Left_Anterior_Joint,
-  Left_Posterior_Joint,
-	Right_Anterior_Joint,
-  Right_Posterior_Joint,
+	L_A_Joint,
+  L_P_Joint,
+	R_A_Joint,
+  R_P_Joint,
 	Damiao_MOTOR_USAGE_NUM
 }Damiao_MOTOR_USAGE_e;
 /**
@@ -75,12 +75,12 @@ typedef enum
 }Motor_Status_e;
 
 /**
- * @brief typedef enum that contains the type of RMD Motor Device.
+ * @brief typedef enum that contains the type of LK Motor Device.
  */
 typedef enum{
-	  RMD_L9025,
-    RMD_MOTOR_TYPE_NUM,
-}RMD_Motor_Type_e;
+	  LK_L9025,
+    LK_MOTOR_TYPE_NUM,
+}LK_Motor_Type_e;
 
 /**
  * @brief typedef enum that contains the type of DJI Motor Device.
@@ -128,13 +128,14 @@ typedef struct
 typedef struct 
 {
   bool Initlized;   /*!< init flag */
-
+  
   int16_t  Current;   /*!< Motor electric current */
-  int16_t  Velocity;    /*!< Motor rotate velocity */
+  int16_t  Velocity;    /*!< Motor rotate velocity */\
 	float    Rad_Velocity;
-  float    Angle;   /*!< Motor angle in degree */
+	int16_t  Encoder; 
   uint8_t  Temperature;   /*!< Motor Temperature */
-}RMD_GeneralInfo_Typedef;
+
+}LK_GeneralInfo_Typedef;
 /**
  * @brief typedef structure that contains the information for the DJI Motor Device.
  */
@@ -157,6 +158,8 @@ typedef struct
  */
 typedef struct
 {
+	bool lost;
+	uint8_t Online_cnt;
 	DJI_Motor_Type_e Type;   /*!< Type of Motor */
   Motor_CANFrameInfo_typedef CANFrame;    /*!< information for the CAN Transfer */
 	Motor_GeneralInfo_Typedef Data;   /*!< information for the Motor Device */
@@ -168,7 +171,9 @@ typedef struct
  */
 typedef struct
 {
+	bool lost;
 	uint8_t ID;   /*!< Type of Motor */
+	uint8_t Online_cnt;
   Motor_CANFrameInfo_typedef CANFrame;    /*!< information for the CAN Transfer */
 	Damiao_GeneralInfo_Typedef Data;   /*!< information for the Motor Device */
 	Motor_ErrorrHandler_Typedef ERRORHandler;   /*!< information for the Motor Error */
@@ -187,17 +192,19 @@ typedef struct
  */
 typedef struct
 {
-	uint8_t order;   /*!< Motor feedback order */
-	RMD_Motor_Type_e Type;   /*!< Type of Motor */
+	bool lost;
+	uint8_t Online_cnt;
+	bool Initlized;   /*!< Motor feedback order */
+	LK_Motor_Type_e Type;   /*!< Type of Motor */
   Motor_CANFrameInfo_typedef CANFrame;    /*!< information for the CAN Transfer */
-	RMD_GeneralInfo_Typedef Data;   /*!< information for the Motor Device */
+	LK_GeneralInfo_Typedef Data;   /*!< information for the Motor Device */
 	Motor_ErrorrHandler_Typedef ERRORHandler;   /*!< information for the Motor Error */
-}RMD_L9025_Info_Typedef;
+}LK_L9025_Info_Typedef;
 
 
-extern RMD_L9025_Info_Typedef RMD_Motor[RMD_MOTOR_USAGE_NUM];
+extern LK_L9025_Info_Typedef LK_Motor[LK_MOTOR_USAGE_NUM];
 
-extern DJI_Motor_Info_Typedef DJI_Motor[DJI_MOTOR_USAGE_NUM];
+extern DJI_Motor_Info_Typedef DJI_Yaw_Motor;
 
 extern Damiao_Motor_Info_Typedef Damiao_Motor[Damiao_MOTOR_USAGE_NUM];
 
@@ -208,14 +215,15 @@ extern Damiao_Motor_Contorl_Info_Typedef  Damiao_Motor_Contorl_Info[4];
   */
 extern void DJI_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,DJI_Motor_Info_Typedef *DJI_Motor);
 /**
-  * @brief  Update the RMD motor Information
+  * @brief  Update the LK motor Information
   */
-extern void RMD_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,RMD_L9025_Info_Typedef *RMD_Motor);
+extern void LK_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,LK_L9025_Info_Typedef *LK_Motor);
 
 extern void Damiao_Motor_Info_Update(uint8_t *rxBuf,Damiao_Motor_Info_Typedef *Damiao_Motor);
 
-extern void  Damiao_Motor_Enable(uint8_t ID);
-extern void Damiao_Motor_2Enable(uint8_t ID);
-extern void  Damiao_Motor_DisEnable(uint8_t ID);
+extern void Damiao_Motor_CAN_Send(uint8_t ID,float Postion, float Velocity, float KP, float KD, float Torque);
 
+extern void Damiao_Motor_Enable(uint8_t ID);
+
+extern void Damiao_Motor_DisEnable(uint8_t ID);
 #endif //DEVICE_MOTOR_H

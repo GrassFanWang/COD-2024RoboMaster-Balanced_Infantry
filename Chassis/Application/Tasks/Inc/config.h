@@ -28,7 +28,7 @@
 /**
  * @brief the value of local gravity acceleration
  */
-#define GravityAccel  9.79849f  
+#define GravityAccel  9.794f  
 
 #define Angle_to_rad  0.01745329f
 

@@ -3,6 +3,7 @@
 .\chassis\api_trajectory.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
 .\chassis\api_trajectory.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdbool.h
 .\chassis\api_trajectory.o: ../Components/Device/Inc/minipc.h
+.\chassis\api_trajectory.o: ../Bsp/Inc/bsp_dwt.h
 .\chassis\api_trajectory.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\math.h
 .\chassis\api_trajectory.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
 .\chassis\api_trajectory.o: ../Drivers/CMSIS/Include/core_cm4.h

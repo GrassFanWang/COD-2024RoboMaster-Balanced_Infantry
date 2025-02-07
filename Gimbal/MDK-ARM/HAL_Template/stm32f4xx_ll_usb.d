@@ -6,7 +6,7 @@
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/CMSIS/Include/core_cm4.h
-.\hal_template\stm32f4xx_ll_usb.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+.\hal_template\stm32f4xx_ll_usb.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/CMSIS/Include/cmsis_version.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -14,7 +14,7 @@
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-.\hal_template\stm32f4xx_ll_usb.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
+.\hal_template\stm32f4xx_ll_usb.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stddef.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 .\hal_template\stm32f4xx_ll_usb.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h

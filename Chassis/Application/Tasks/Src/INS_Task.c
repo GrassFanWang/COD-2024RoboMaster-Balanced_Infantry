@@ -41,11 +41,11 @@ LowPassFilter2p_Info_TypeDef INS_AcceLPF2p[3];
   * @brief the Initialize data of state transition matrix.
   */
 static float QuaternionEKF_A_Data[36]={1, 0, 0, 0, 0, 0,
-                                0, 1, 0, 0, 0, 0,
-                                0, 0, 1, 0, 0, 0,
-                                0, 0, 0, 1, 0, 0,
-                                0, 0, 0, 0, 1, 0,
-                                0, 0, 0, 0, 0, 1};
+                                       0, 1, 0, 0, 0, 0,
+                                       0, 0, 1, 0, 0, 0,
+                                       0, 0, 0, 1, 0, 0,
+                                       0, 0, 0, 0, 1, 0,
+                                       0, 0, 0, 0, 0, 1};
 /**
   * @brief the Initialize data of posteriori covariance matrix.
   */

@@ -26,7 +26,17 @@
   * @brief  Starts the multi_buffer DMA Transfer with interrupt enabled.
   */
 static void USART_RxDMA_MultiBufferStart(UART_HandleTypeDef *, uint32_t *, uint32_t *, uint32_t *, uint32_t);
+ void usart_printf(const char *fmt,...){
+    static va_list ap;
+    static uint16_t len;
+    va_start(ap, fmt);
+	  static uint8_t tx_buf[256] = {0};
+    len = vsnprintf((char *)tx_buf,sizeof(tx_buf) ,(char*)fmt, ap);
+    
+    va_end(ap);
 
+    HAL_UART_Transmit_DMA(&huart1,(uint8_t*)tx_buf, len);
+}
 
 /**
   * @brief  Configures the USART.
@@ -36,10 +46,10 @@ static void USART_RxDMA_MultiBufferStart(UART_HandleTypeDef *, uint32_t *, uint3
 void BSP_USART_Init(void)
 {
   /* Starts the remote control multi_buffer DMA Transfer with interrupt enabled. */
-	USART_RxDMA_MultiBufferStart(&huart3,(uint32_t *)&(huart3.Instance->DR),(uint32_t *)SBUS_MultiRx_Buf[0],(uint32_t *)SBUS_MultiRx_Buf[1],SBUS_RX_BUF_NUM);
+//	USART_RxDMA_MultiBufferStart(&huart3,(uint32_t *)&(huart3.Instance->DR),(uint32_t *)SBUS_MultiRx_Buf[0],(uint32_t *)SBUS_MultiRx_Buf[1],SBUS_RX_BUF_NUM);
 
 	  /* Starts the Referee multi_buffer DMA Transfer with interrupt enabled. */
-	USART_RxDMA_MultiBufferStart(&huart1,(uint32_t *)&(huart1.Instance->DR),(uint32_t *)REFEREE_MultiRx_Buf[0],(uint32_t *)REFEREE_MultiRx_Buf[1],REFEREE_RXFRAME_LENGTH);
+	USART_RxDMA_MultiBufferStart(&huart6,(uint32_t *)&(huart6.Instance->DR),(uint32_t *)REFEREE_MultiRx_Buf[0],(uint32_t *)REFEREE_MultiRx_Buf[1],100U);
 }
 //------------------------------------------------------------------------------
 
@@ -59,8 +69,8 @@ static void USART_RxDMA_MultiBufferStart(UART_HandleTypeDef *huart, uint32_t *Sr
 	huart->ReceptionType = HAL_UART_RECEPTION_TOIDLE;
 
   /* configuare the huart Receicve Size */
-	huart->RxXferSize = SBUS_RX_BUF_NUM;
-	
+//	if( huart == &huart3)huart->RxXferSize = SBUS_RX_BUF_NUM;
+	if( huart == &huart6)huart->RxXferSize = 100U;
   /* Enable the DMA transfer for the receiver request */
   SET_BIT(huart->Instance->CR3, USART_CR3_DMAR);
 
@@ -142,7 +152,7 @@ static void USER_USART3_RxHandler(UART_HandleTypeDef *huart,uint16_t Size)
   *               reception buffer until which, data are available)
   * @retval None
   */
-static void USER_USART1_RxHandler(UART_HandleTypeDef *huart,uint16_t Size)
+static void USER_USART6_RxHandler(UART_HandleTypeDef *huart,uint16_t Size)
 {
   /* Current memory buffer used is Memory 0 */
   if(((((DMA_Stream_TypeDef  *)huart->hdmarx->Instance)->CR) & DMA_SxCR_CT ) == RESET)
@@ -186,13 +196,12 @@ static void USER_USART1_RxHandler(UART_HandleTypeDef *huart,uint16_t Size)
   */
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t Size)
 {
-
-	if(huart->Instance == USART3)
+ if(huart->Instance == USART6)
+	{
+		USER_USART6_RxHandler(huart,Size);
+	}else if(huart->Instance == USART3)
 	{
 		USER_USART3_RxHandler(huart,Size);
-	}else if(huart->Instance == USART1)
-	{
-		USER_USART1_RxHandler(huart,Size);
 	}
 
   /* reset the Reception Type */

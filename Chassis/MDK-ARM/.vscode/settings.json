@@ -41,6 +41,7 @@
         "can_task.h": "c",
         "decision_task.h": "c",
         "ui.h": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "vmc_task.h": "c"
     }
 }

@@ -31,7 +31,7 @@ void MCU_Init(void)
   BSP_CAN_Init();
   BSP_USART_Init();
 	MX_USB_DEVICE_Init();
-
+  
   /* ----------------------- Device Init ----------------------- */
   BMI088_Init();
 }

@@ -22,12 +22,15 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
-
+#include <stdio.h>
+#include <stdarg.h>
+#include "string.h"
 
 /* Exported functions prototypes ---------------------------------------------*/
 /**
   * @brief  Configures the USART.
   */
 extern void BSP_USART_Init(void);
-
+extern void usart_printf(const char *fmt,...);
+#define printf(title, fmt, args...) usart_printf("{"#title"}"fmt"\n", ##args)
 #endif //BSP_UART_H

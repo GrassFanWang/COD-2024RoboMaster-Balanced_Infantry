@@ -165,6 +165,7 @@ typedef  struct
  * @brief remote control structure variable
  */
 extern Remote_Info_Typedef remote_ctrl;
+extern Remote_Pressed_Typedef KeyBoard_Info;
 /**
  * @brief remote control usart RxDMA MultiBuffer
  */

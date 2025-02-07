@@ -1,6 +1,9 @@
 .\chassis\bsp_uart.o: ..\Bsp\Src\bsp_uart.c
 .\chassis\bsp_uart.o: ../Bsp/Inc/bsp_uart.h
 .\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
+.\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdio.h
+.\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdarg.h
+.\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
 .\chassis\bsp_uart.o: ../Core/Inc/usart.h
 .\chassis\bsp_uart.o: ../Core/Inc/main.h
 .\chassis\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
@@ -35,13 +38,9 @@
 .\chassis\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 .\chassis\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 .\chassis\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-.\chassis\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h
-.\chassis\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h
-.\chassis\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 .\chassis\bsp_uart.o: ../Components/Device/Inc/remote_control.h
 .\chassis\bsp_uart.o: ../Application/Tasks/Inc/config.h
 .\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdbool.h
 .\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
-.\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
 .\chassis\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\math.h
 .\chassis\bsp_uart.o: ../Components/Device/Inc/referee_info.h

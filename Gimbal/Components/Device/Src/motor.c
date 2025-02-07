@@ -14,30 +14,41 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "motor.h"
+#include "bsp_can.h"
+#include "lpf.h"
+#include "arm_math.h"
+#include "math.h"
 
-DJI_Motor_Info_Typedef DJI_Motor[DJI_MOTOR_USAGE_NUM]={
-  [Pitch]={
-    .Type = DJI_GM6020,
-    .CANFrame.RxStdId = 0x206,
+
+ Damiao_Motor_Info_Typedef Damiao_Pitch_Motor ={
+  .CANFrame.TxStdId = 0x01,
+  .CANFrame.RxStdId = 0x01,
+	.lost =1,
+ };
+
+DJI_Motor_Info_Typedef DJI_Motor[DJI_MOTOR_USAGE_NUM]= {
+  [Trigger] = { 
+   .CANFrame.RxStdId = 0x201,
+   .Type = DJI_M2006,
   },
-  [Yaw]={
-    .Type = DJI_GM6020,
-    .CANFrame.RxStdId = 0x205,
+  [Left_Shoot] = { 
+   .CANFrame.RxStdId = 0x202,
+   .Type = DJI_M3508,
   },
-  [SHOOTL]={
-    .Type = DJI_M3508,
-    .CANFrame.RxStdId = 0x201,
+  [Right_Shoot] = { 
+   .CANFrame.RxStdId = 0x204,
+   .Type = DJI_M3508,
   },
-  [SHOOTR]={
-    .Type = DJI_M3508,
-    .CANFrame.RxStdId = 0x202,
+  [Yaw] = { 
+   .CANFrame.RxStdId = 0x206,
+   .Type = DJI_GM6020,
   },
-  [TRIGGER]={
-    .Type = DJI_M2006,
-    .CANFrame.RxStdId = 0x203,
-  },
+
 };
 
+
+
+//};
 /* Private function prototypes -----------------------------------------------*/
 /**
   * @brief  transform the encoder(0-8192) to anglesum(3.4E38)
@@ -50,8 +61,12 @@ float encoder_to_angle(Motor_GeneralInfo_Typedef *,float ,uint16_t );
 /** 
   * @brief  Judge the DJI Motor state
   */
+static int float_to_uint(float x, float x_min, float x_max, int bits);
+static float uint_to_float(int X_int, float X_min, float X_max, int Bits);
+
 static void DJI_Motor_ErrorHandler(DJI_Motor_Info_Typedef *);
 
+static void Damiao_Motor_ErrorHandler(Damiao_Motor_Info_Typedef *Damiao_Motor);
 /**
   * @brief  Update the DJI motor Information
   * @param  StdId  pointer to the specifies the standard identifier.
@@ -63,89 +78,77 @@ static void DJI_Motor_ErrorHandler(DJI_Motor_Info_Typedef *);
 void DJI_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,DJI_Motor_Info_Typedef *DJI_Motor)
 {
 	/* check the StdId */
-	if(*StdId != DJI_Motor->CANFrame.RxStdId)
-  {
-    return;
-  }
-	
+
+	if(*StdId != DJI_Motor->CANFrame.RxStdId) return;
 	/* transforms the  general motor data */
 	DJI_Motor->Data.temperature = rxBuf[6];
 	DJI_Motor->Data.encoder  = ((int16_t)rxBuf[0] << 8 | (int16_t)rxBuf[1]);
 	DJI_Motor->Data.velocity = ((int16_t)rxBuf[2] << 8 | (int16_t)rxBuf[3]);
 	DJI_Motor->Data.current  = ((int16_t)rxBuf[4] << 8 | (int16_t)rxBuf[5]);
-	
 	/* Judge the motor error	*/
 	DJI_Motor_ErrorHandler(DJI_Motor);
 
   /* update the txframe id and index */
-  if(DJI_Motor->Data.Initlized != true)
-  {
-    if(DJI_Motor->CANFrame.RxStdId > DJI_RxFrame_MIDDLE)
-    {
-      DJI_Motor->CANFrame.TxStdId = DJI_TxFrame_HIGH;
-      DJI_Motor->CANFrame.FrameIndex = 2*(DJI_Motor->CANFrame.RxStdId - DJI_RxFrame_MIDDLE - 0x01U);
-    }
-    else if(DJI_Motor->CANFrame.RxStdId > DJI_TxFrame_LOW)
-    {
-      DJI_Motor->CANFrame.TxStdId = DJI_TxFrame_LOW; 
-      DJI_Motor->CANFrame.FrameIndex = 2*(DJI_Motor->CANFrame.RxStdId - DJI_TxFrame_LOW - 0x01U);
-    }
-  }
-	
+
 	/* transform the encoder to anglesum */
 	switch(DJI_Motor->Type)
 	{
 		case DJI_GM6020:
-			DJI_Motor->Data.angle = encoder_to_anglesum(&DJI_Motor->Data,1.f,8192);
+			DJI_Motor->Data.angle = encoder_to_angle(&DJI_Motor->Data,1.f,8192);
 		break;
 	
 		case DJI_M3508:
-			DJI_Motor->Data.angle = encoder_to_anglesum(&DJI_Motor->Data,3591.f/187.f,8192);
+			DJI_Motor->Data.angle = encoder_to_angle(&DJI_Motor->Data,3591.f/187.f,8192);
 		break;
 		
 		case DJI_M2006:
-			DJI_Motor->Data.angle = encoder_to_anglesum(&DJI_Motor->Data,36.f,8192);
+			DJI_Motor->Data.angle = encoder_to_angle(&DJI_Motor->Data,36.f,8192);
 		break;
 		
 		default:break;
 	}
 }
 //------------------------------------------------------------------------------
-
 /**
-  * @brief  Update the RMD motor Information
+  * @brief  Update the Damiao motor Information
   * @param  StdId  pointer to the specifies the standard identifier.
   * @param  rxBuf  pointer to the can receive data
-  * @param  RMD_Motor pointer to a RMD_L9025_Info_Typedef structure that contains the information of RMD motor
+  * @param  LK_Motor pointer to a LK_L9025_Info_Typedef structure that contains the information of LK motor
   * @retval None
   */
-void RMD_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,RMD_L9025_Info_Typedef *RMD_Motor)
+void Damiao_Motor_Info_Update(uint8_t *rxBuf,Damiao_Motor_Info_Typedef *Damiao_Motor)
 {
 	/* Judge the StdId */
-	if(*StdId != RMD_Motor->CANFrame.RxStdId)
-  {
-    return;
-  }
+  	Damiao_Motor->ID = rxBuf[0]&0x0F;
+	 if(Damiao_Motor->ID != Damiao_Motor->CANFrame.RxStdId) return;
+	  Damiao_Motor->Data.State = rxBuf[0]>>4;
+		Damiao_Motor->Data.P_int = ((uint16_t)(rxBuf[1]) <<8) | ((uint16_t)(rxBuf[2]));
+		Damiao_Motor->Data.V_int = ((uint16_t)(rxBuf[3]) <<4) | ((uint16_t)(rxBuf[4])>>4);
+		Damiao_Motor->Data.T_int = ((uint16_t)(rxBuf[4]&0xF) <<8) | ((uint16_t)(rxBuf[5]));
+		Damiao_Motor->Data.Torque=  uint_to_float(Damiao_Motor->Data.T_int,-45,45,12);
+		Damiao_Motor->Data.Position=uint_to_float(Damiao_Motor->Data.P_int,-3.141593f,3.141593f,16);
+    Damiao_Motor->Data.Velocity=uint_to_float(Damiao_Motor->Data.V_int,-50,50,12);
 
-  /* Update the receive order */
-	RMD_Motor->order = rxBuf[0];
-	
-	/* transforms the  general motor data */
-	RMD_Motor->Data.temperature = rxBuf[1];
-	RMD_Motor->Data.current  = ((int16_t)(rxBuf[2]) | (int16_t)(rxBuf[3]<<8));
-	RMD_Motor->Data.velocity = ((int16_t)(rxBuf[4]) | (int16_t)(rxBuf[5]<<8));
-	RMD_Motor->Data.encoder  = ((int16_t)(rxBuf[6]) | (int16_t)(rxBuf[7]<<8));
+    Damiao_Motor->Data.Temperature_MOS   = (float)(rxBuf[6]);
+		Damiao_Motor->Data.Temperature_Rotor = (float)(rxBuf[7]);
+	  Damiao_Motor->Online_cnt = 250;
+	   Damiao_Motor->lost = 0;
 
-	/* transform the encoder to anglesum */
-	switch(RMD_Motor->Type)
-  {
-    case RMD_L9025:
-      RMD_Motor->Data.angle = encoder_to_anglesum(&RMD_Motor->Data,1.f,32768);
-    break;
-
-    default:break;
-  }
+	if(Damiao_Motor->Data.State!=0){
+   Damiao_Motor_ErrorHandler(Damiao_Motor);
+	}
 }
+
+
+
+/**
+  * @brief  Update the LK motor Information
+  * @param  StdId  pointer to the specifies the standard identifier.
+  * @param  rxBuf  pointer to the can receive data
+  * @param  LK_Motor pointer to a LK_L9025_Info_Typedef structure that contains the information of LK motor
+  * @retval None
+  */
+
 //------------------------------------------------------------------------------
 
 /**
@@ -254,7 +257,7 @@ float encoder_to_angle(Motor_GeneralInfo_Typedef *Info,float torque_ratio,uint16
     Info->last_encoder = Info->encoder;
 
     /* reset the angle */
-    Info->angle = 0;
+    Info->angle = Info->encoder/(MAXencoder*torque_ratio)*360.f;
 
     /* config the init flag */
     Info->Initlized = true;
@@ -281,7 +284,7 @@ float encoder_to_angle(Motor_GeneralInfo_Typedef *Info,float torque_ratio,uint16
   Info->last_encoder = Info->encoder;
   
   /* loop constrain */
-  f_loop_constrain(Info->angle,-180.f,180.f);
+  Info->angle = f_loop_constrain(Info->angle,-180.f,180.f);
 
   return Info->angle;
 }
@@ -311,7 +314,72 @@ static void DJI_Motor_ErrorHandler(DJI_Motor_Info_Typedef *DJI_Motor)
     DJI_Motor->ERRORHandler.ErrorCount = 0;	
 	}
 }
+void Damiao_Motor_Enable(uint8_t ID){
+   Pitch_TxFrame.Data[0] = 0xFF;
+   Pitch_TxFrame.Data[1] = 0xFF;
+   Pitch_TxFrame.Data[2] = 0xFF;
+   Pitch_TxFrame.Data[3] = 0xFF;
+   Pitch_TxFrame.Data[4] = 0xFF;
+   Pitch_TxFrame.Data[5] = 0xFF;
+   Pitch_TxFrame.Data[6] = 0xFF;
+	 Pitch_TxFrame.Data[7] = 0xFC;
+	 USER_CAN_TxMessage(&Pitch_TxFrame);
+}
+void Damiao_Motor_CAN_Send(uint8_t ID,float Postion, float Velocity, float KP, float KD, float Torque){
+   static uint16_t Postion_Tmp,Velocity_Tmp,Torque_Tmp,KP_Tmp,KD_Tmp;
+   Postion_Tmp  =  float_to_uint(Postion,-3.141593f,3.141593,16) ;
+   Velocity_Tmp =  float_to_uint(Velocity,-50,50,12);
+	 KP_Tmp = float_to_uint(KP,0,500,12);
+	 KD_Tmp = float_to_uint(KD,0,5,12);
+   Torque_Tmp = float_to_uint(Torque,-45,45,12);
+	 Pitch_TxFrame.Data[0] = (uint8_t)(Postion_Tmp>>8);
+	 Pitch_TxFrame.Data[1] = (uint8_t)(Postion_Tmp);
+	 Pitch_TxFrame.Data[2] = (uint8_t)(Velocity_Tmp>>4);
+	 Pitch_TxFrame.Data[3] = (uint8_t)((Velocity_Tmp&0x0F)<<4) | (uint8_t)(KP_Tmp>>8);
+	 Pitch_TxFrame.Data[4] = (uint8_t)(KP_Tmp);
+	 Pitch_TxFrame.Data[5] = (uint8_t)(KD_Tmp>>4);
+	 Pitch_TxFrame.Data[6] = (uint8_t)((KD_Tmp&0x0F)<<4) | (uint8_t)(Torque_Tmp>>8);
+	 Pitch_TxFrame.Data[7] = (uint8_t)(Torque_Tmp);
+   USER_CAN_TxMessage(&Pitch_TxFrame);
+}
+
+
+void Damiao_Motor_DisEnable(uint8_t ID){
+   Pitch_TxFrame.Data[0] = 0xFF;
+   Pitch_TxFrame.Data[1] = 0xFF;
+   Pitch_TxFrame.Data[2] = 0xFF;
+   Pitch_TxFrame.Data[3] = 0xFF;
+   Pitch_TxFrame.Data[4] = 0xFF;
+   Pitch_TxFrame.Data[5] = 0xFF;
+   Pitch_TxFrame.Data[6] = 0xFF;
+	 Pitch_TxFrame.Data[7] = 0xFD;
+	 USER_CAN_TxMessage(&Pitch_TxFrame);
+}
+static void Damiao_Motor_ErrorHandler(Damiao_Motor_Info_Typedef *Damiao_Motor)
+{
+	Damiao_Motor->ERRORHandler.ErrorCount++;
+  if(	Damiao_Motor->ERRORHandler.ErrorCount>200){
+	 Damiao_Motor_DisEnable(Damiao_Motor->CANFrame.TxStdId);
+	}
+}
 //------------------------------------------------------------------------------
+
+
+static int float_to_uint(float x, float x_min, float x_max, int bits){
+    float span = x_max - x_min;
+    float offset = x_min;
+    return (int) ((x-offset)*((float)((1<<bits)-1))/span);
+}
+static float uint_to_float(int X_int, float X_min, float X_max, int Bits){
+    /// converts unsigned int to float, given range and number of bits ///
+    float span = X_max - X_min;
+    float offset = X_min;
+    return ((float)X_int)*span/((float)((1<<Bits)-1)) + offset;
+}
+
+
+
+
 
 
 

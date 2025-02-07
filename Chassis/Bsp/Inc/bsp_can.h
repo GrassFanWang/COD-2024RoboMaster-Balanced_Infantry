@@ -23,7 +23,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
 #include "stm32f4xx.h"
-
+#include "math.h"
 /* Exported types ------------------------------------------------------------*/
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -31,7 +31,7 @@ typedef struct {
 		CAN_HandleTypeDef *hcan;
     CAN_RxHeaderTypeDef header;
     uint8_t 			Data[8];
-} CAN_RxFrameTypeDef;
+}CAN_RxFrameTypeDef;
 
 typedef struct {
 		CAN_HandleTypeDef *hcan;
@@ -39,8 +39,8 @@ typedef struct {
     uint8_t				Data[8];
 }CAN_TxFrameTypeDef;
 
-extern CAN_TxFrameTypeDef JointTxFrame[4],ChassisTxFrame,ContorlTxFrame;
-extern CAN_TxFrameTypeDef  RMD_L9025_Left_TxFrame,RMD_L9025_Right_TxFrame;
+extern CAN_TxFrameTypeDef JointTxFrame[4],ChassisTxFrame,ContorlTxFrame,SuperCapTxFrame,RefreeInfoTxFrame;
+extern CAN_TxFrameTypeDef  LK_L9025_Left_TxFrame,LK_L9025_Right_TxFrame;
 /**
   * @brief  Configures the CAN Filter.
   */
@@ -49,6 +49,6 @@ extern void BSP_CAN_Init(void);
   * @brief  USER function to transmit the Specifies message.
   */
 extern void USER_CAN_TxMessage(CAN_TxFrameTypeDef *TxHeader);
-
+extern uint8_t remote;
 #endif //BSP_CAN_H
 

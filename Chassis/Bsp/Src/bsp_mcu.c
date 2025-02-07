@@ -19,7 +19,7 @@
 #include "bsp_uart.h"
 #include "bsp_dwt.h"
 #include "bmi088.h"
-#include "usb_device.h"
+//#include "usb_device.h"
 
 /**
   * @brief Initializes the MCU.
@@ -30,7 +30,7 @@ void MCU_Init(void)
   Bsp_Tim_Init();
   BSP_CAN_Init();
   BSP_USART_Init();
-	MX_USB_DEVICE_Init();
+//	MX_USB_DEVICE_Init();
 
   /* ----------------------- Device Init ----------------------- */
   BMI088_Init();

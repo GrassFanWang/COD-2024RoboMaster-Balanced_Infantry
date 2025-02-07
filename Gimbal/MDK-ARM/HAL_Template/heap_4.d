@@ -1,8 +1,8 @@
 .\hal_template\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
-.\hal_template\heap_4.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\hal_template\heap_4.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
 .\hal_template\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-.\hal_template\heap_4.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-.\hal_template\heap_4.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+.\hal_template\heap_4.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stddef.h
+.\hal_template\heap_4.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
 .\hal_template\heap_4.o: ../Core/Inc/FreeRTOSConfig.h
 .\hal_template\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\hal_template\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

@@ -28,7 +28,7 @@
 /**
  * @brief the value of local gravity acceleration
  */
-#define GravityAccel  9.8035f  
+#define GravityAccel  9.794f  
 
 /**
   * @brief Euler's Number
@@ -77,12 +77,12 @@
  *        0: DISABLE
  *        1: ENABLE
  */
-#define IMU_Calibration_ENABLE  1U
+#define IMU_Calibration_ENABLE  0U
 
 /**
  * @brief the index of pitch angle update
  */
-#define IMU_ANGLE_INDEX_PITCH  1U
+#define IMU_ANGLE_INDEX_PITCH  2U
 /**
  * @brief the index of yaw angle update
  */
@@ -90,12 +90,12 @@
 /**
  * @brief the index of roll angle update
  */
-#define IMU_ANGLE_INDEX_ROLL   2U
+#define IMU_ANGLE_INDEX_ROLL   1U
 
 /**
  * @brief the index of pitch gyro update
  */
-#define IMU_GYRO_INDEX_PITCH  1U
+#define IMU_GYRO_INDEX_PITCH  0U
 /**
  * @brief the index of yaw gyro update
  */
@@ -103,12 +103,12 @@
 /**
  * @brief the index of roll gyro update
  */
-#define IMU_GYRO_INDEX_ROLL   0U
+#define IMU_GYRO_INDEX_ROLL   1U
 
 /**
  * @brief the index of pitch accel update
  */
-#define IMU_ACCEL_INDEX_PITCH  1U
+#define IMU_ACCEL_INDEX_PITCH  0U
 /**
  * @brief the index of yaw accel update
  */
@@ -116,7 +116,7 @@
 /**
  * @brief the index of roll accel update
  */
-#define IMU_ACCEL_INDEX_ROLL   0U
+#define IMU_ACCEL_INDEX_ROLL   1U
 
 
 #endif //ROBOT_CONFIG_H

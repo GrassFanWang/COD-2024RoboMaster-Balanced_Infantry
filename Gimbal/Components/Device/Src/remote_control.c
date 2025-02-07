@@ -34,7 +34,7 @@ uint8_t SBUS_MultiRx_Buf[2][SBUS_RX_BUF_NUM];
 /**
  * @brief structure that contains the information of keyboard
  */
-static Remote_Pressed_Typedef KeyBoard_Info;
+Remote_Pressed_Typedef KeyBoard_Info;
 
 /* Private function prototypes -----------------------------------------------*/
 /**
@@ -105,7 +105,6 @@ void Remote_Message_Moniter(Remote_Info_Typedef  *remote_ctrl)
     memset(remote_ctrl,0,sizeof(Remote_Info_Typedef));
 
     /* reset the online count */
-    remote_ctrl->online_cnt = 0xFAU;
 		
     /* set the lost flag */
 		remote_ctrl->rc_lost = true;

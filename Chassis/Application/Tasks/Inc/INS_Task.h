@@ -18,6 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
+#include "api_quaternion.h"
 
 /* Exported types ------------------------------------------------------------*/
 /**
@@ -48,7 +49,7 @@ typedef struct
   */
 extern INS_Info_Typedef INS_Info; 
 
-
+extern Quaternion_Info_Typedef Quaternion_Info;
 /* Exported functions prototypes ---------------------------------------------*/
 
 #endif //INS_TASK_H

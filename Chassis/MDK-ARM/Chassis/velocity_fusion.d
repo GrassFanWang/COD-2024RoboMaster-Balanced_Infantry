@@ -1,0 +1,14 @@
+.\chassis\velocity_fusion.o: ..\Components\Algorithm\Src\Velocity_Fusion.c
+.\chassis\velocity_fusion.o: ../Components/Algorithm/Inc/Velocity_Fusion.h
+.\chassis\velocity_fusion.o: ../Components/Algorithm/Inc/kalman.h
+.\chassis\velocity_fusion.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
+.\chassis\velocity_fusion.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
+.\chassis\velocity_fusion.o: ../Drivers/CMSIS/Include/core_cm4.h
+.\chassis\velocity_fusion.o: ../Drivers/CMSIS/Include/cmsis_version.h
+.\chassis\velocity_fusion.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
+.\chassis\velocity_fusion.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
+.\chassis\velocity_fusion.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
+.\chassis\velocity_fusion.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\math.h
+.\chassis\velocity_fusion.o: ../Application/Tasks/Inc/config.h
+.\chassis\velocity_fusion.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdbool.h
+.\chassis\velocity_fusion.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h

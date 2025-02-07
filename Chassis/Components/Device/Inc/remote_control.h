@@ -164,6 +164,7 @@ typedef  struct
  * @brief remote control structure variable
  */
 extern Remote_Info_Typedef remote_ctrl;
+extern Remote_Pressed_Typedef KeyBoard_Info;
 /**
  * @brief remote control usart RxDMA MultiBuffer
  */
@@ -210,6 +211,8 @@ extern void Remote_Info_Update(uint32_t *StdId, uint8_t *rxBuf,Remote_Info_Typed
 
 extern bool Key_W(void);
 extern bool Key_S(void);
+extern bool Key_A(void);
+extern bool Key_D(void);
 extern bool Key_Shift(void);
 extern bool Key_Ctrl(void);
 extern bool Key_Q(void);

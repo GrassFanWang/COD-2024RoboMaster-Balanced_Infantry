@@ -464,7 +464,7 @@ ARM Macro Assembler    Page 8
   171 00000000                 IMPORT           SystemInit
   172 00000000                 IMPORT           __main
   173 00000000         
-  174 00000000 4809            LDR              R0, =SystemInit
+  174 00000000 4809    8       LDR              R0, =SystemInit
   175 00000002 4780            BLX              R0
   176 00000004 4809            LDR              R0, =__main
   177 00000006 4700            BX               R0
@@ -841,18 +841,18 @@ ARM Macro Assembler    Page 13
               00002000 
               00002000 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
-erwork --depend=.\hal_template\startup_stm32f407xx.d -o.\hal_template\startup_s
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
+interwork --depend=.\hal_template\startup_stm32f407xx.d -o.\hal_template\startu
 
 
 
 ARM Macro Assembler    Page 14 
 
 
-tm32f407xx.o -I../Core/Inc -I.\RTE\_Gimbal -ID:\MDK5\ARM\PACK\Keil\STM32F4xx_DF
-P\2.13.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include -ID:\MDK5\ARM\CMSIS\Include 
---predefine="__UVISION_VERSION SETA 523" --predefine="STM32F407xx SETA 1" --lis
-t=startup_stm32f407xx.lst startup_stm32f407xx.s
+p_stm32f407xx.o -I../Core/Inc -ID:\STM32Pro\MDK5\Packs\Keil\STM32F4xx_DFP\2.17.
+1\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefine="__UVISION_VERSION SETA
+ 538" --predefine="STM32F407xx SETA 1" --list=startup_stm32f407xx.lst startup_s
+tm32f407xx.s
 
 
 
@@ -964,6 +964,14 @@ Symbol: __Vectors_End
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
+ 00000000
+
+Symbol: 
+   Definitions
+      None
+   Uses
+      None
+Warning:  undefinedComment:  unused
 .text 00000000
 
 Symbol: .text
@@ -1015,6 +1023,12 @@ Symbol: CAN1_SCE_IRQHandler
       At line 330 in file startup_stm32f407xx.s
    Uses
       At line 100 in file startup_stm32f407xx.s
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
       At line 248 in file startup_stm32f407xx.s
 
 CAN1_TX_IRQHandler 0000001A
@@ -1023,12 +1037,6 @@ Symbol: CAN1_TX_IRQHandler
    Definitions
       At line 327 in file startup_stm32f407xx.s
    Uses
-
-
-
-ARM Macro Assembler    Page 2 Alphabetic symbol ordering
-Relocatable symbols
-
       At line 97 in file startup_stm32f407xx.s
       At line 245 in file startup_stm32f407xx.s
 
@@ -1080,6 +1088,12 @@ Symbol: DCMI_IRQHandler
 DMA1_Stream0_IRQHandler 0000001A
 
 Symbol: DMA1_Stream0_IRQHandler
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
    Definitions
       At line 319 in file startup_stm32f407xx.s
    Uses
@@ -1087,12 +1101,6 @@ Symbol: DMA1_Stream0_IRQHandler
       At line 237 in file startup_stm32f407xx.s
 
 DMA1_Stream1_IRQHandler 0000001A
-
-
-
-
-ARM Macro Assembler    Page 3 Alphabetic symbol ordering
-Relocatable symbols
 
 Symbol: DMA1_Stream1_IRQHandler
    Definitions
@@ -1146,6 +1154,12 @@ Symbol: DMA1_Stream6_IRQHandler
       At line 95 in file startup_stm32f407xx.s
       At line 243 in file startup_stm32f407xx.s
 
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Relocatable symbols
+
+
 DMA1_Stream7_IRQHandler 0000001A
 
 Symbol: DMA1_Stream7_IRQHandler
@@ -1153,12 +1167,6 @@ Symbol: DMA1_Stream7_IRQHandler
       At line 355 in file startup_stm32f407xx.s
    Uses
       At line 125 in file startup_stm32f407xx.s
-
-
-
-ARM Macro Assembler    Page 4 Alphabetic symbol ordering
-Relocatable symbols
-
       At line 273 in file startup_stm32f407xx.s
 
 DMA2_Stream0_IRQHandler 0000001A
@@ -1210,6 +1218,12 @@ DMA2_Stream5_IRQHandler 0000001A
 
 Symbol: DMA2_Stream5_IRQHandler
    Definitions
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Relocatable symbols
+
       At line 376 in file startup_stm32f407xx.s
    Uses
       At line 146 in file startup_stm32f407xx.s
@@ -1218,12 +1232,6 @@ Symbol: DMA2_Stream5_IRQHandler
 DMA2_Stream6_IRQHandler 0000001A
 
 Symbol: DMA2_Stream6_IRQHandler
-
-
-
-ARM Macro Assembler    Page 5 Alphabetic symbol ordering
-Relocatable symbols
-
    Definitions
       At line 377 in file startup_stm32f407xx.s
    Uses
@@ -1276,18 +1284,18 @@ Symbol: ETH_WKUP_IRQHandler
 
 EXTI0_IRQHandler 0000001A
 
+
+
+ARM Macro Assembler    Page 6 Alphabetic symbol ordering
+Relocatable symbols
+
+
 Symbol: EXTI0_IRQHandler
    Definitions
       At line 314 in file startup_stm32f407xx.s
    Uses
       At line 84 in file startup_stm32f407xx.s
       At line 232 in file startup_stm32f407xx.s
-
-
-
-
-ARM Macro Assembler    Page 6 Alphabetic symbol ordering
-Relocatable symbols
 
 EXTI15_10_IRQHandler 0000001A
 
@@ -1340,6 +1348,12 @@ Symbol: EXTI9_5_IRQHandler
    Definitions
       At line 331 in file startup_stm32f407xx.s
    Uses
+
+
+
+ARM Macro Assembler    Page 7 Alphabetic symbol ordering
+Relocatable symbols
+
       At line 101 in file startup_stm32f407xx.s
       At line 249 in file startup_stm32f407xx.s
 
@@ -1348,12 +1362,6 @@ FLASH_IRQHandler 0000001A
 Symbol: FLASH_IRQHandler
    Definitions
       At line 312 in file startup_stm32f407xx.s
-
-
-
-ARM Macro Assembler    Page 7 Alphabetic symbol ordering
-Relocatable symbols
-
    Uses
       At line 82 in file startup_stm32f407xx.s
       At line 230 in file startup_stm32f407xx.s
@@ -1405,6 +1413,12 @@ Symbol: I2C1_ER_IRQHandler
 
 I2C1_EV_IRQHandler 0000001A
 
+
+
+
+ARM Macro Assembler    Page 8 Alphabetic symbol ordering
+Relocatable symbols
+
 Symbol: I2C1_EV_IRQHandler
    Definitions
       At line 339 in file startup_stm32f407xx.s
@@ -1413,12 +1427,6 @@ Symbol: I2C1_EV_IRQHandler
       At line 257 in file startup_stm32f407xx.s
 
 I2C2_ER_IRQHandler 0000001A
-
-
-
-ARM Macro Assembler    Page 8 Alphabetic symbol ordering
-Relocatable symbols
-
 
 Symbol: I2C2_ER_IRQHandler
    Definitions
@@ -1470,6 +1478,12 @@ Symbol: NMI_Handler
       At line 182 in file startup_stm32f407xx.s
    Uses
       At line 62 in file startup_stm32f407xx.s
+
+
+
+ARM Macro Assembler    Page 9 Alphabetic symbol ordering
+Relocatable symbols
+
       At line 183 in file startup_stm32f407xx.s
 
 OTG_FS_IRQHandler 0000001A
@@ -1478,12 +1492,6 @@ Symbol: OTG_FS_IRQHandler
    Definitions
       At line 375 in file startup_stm32f407xx.s
    Uses
-
-
-
-ARM Macro Assembler    Page 9 Alphabetic symbol ordering
-Relocatable symbols
-
       At line 145 in file startup_stm32f407xx.s
       At line 293 in file startup_stm32f407xx.s
 
@@ -1535,6 +1543,12 @@ Symbol: OTG_HS_WKUP_IRQHandler
 PVD_IRQHandler 0000001A
 
 Symbol: PVD_IRQHandler
+
+
+
+ARM Macro Assembler    Page 10 Alphabetic symbol ordering
+Relocatable symbols
+
    Definitions
       At line 309 in file startup_stm32f407xx.s
    Uses
@@ -1542,12 +1556,6 @@ Symbol: PVD_IRQHandler
       At line 227 in file startup_stm32f407xx.s
 
 PendSV_Handler 00000016
-
-
-
-
-ARM Macro Assembler    Page 10 Alphabetic symbol ordering
-Relocatable symbols
 
 Symbol: PendSV_Handler
    Definitions
@@ -1601,6 +1609,12 @@ Symbol: SDIO_IRQHandler
       At line 127 in file startup_stm32f407xx.s
       At line 275 in file startup_stm32f407xx.s
 
+
+
+ARM Macro Assembler    Page 11 Alphabetic symbol ordering
+Relocatable symbols
+
+
 SPI1_IRQHandler 0000001A
 
 Symbol: SPI1_IRQHandler
@@ -1608,12 +1622,6 @@ Symbol: SPI1_IRQHandler
       At line 343 in file startup_stm32f407xx.s
    Uses
       At line 113 in file startup_stm32f407xx.s
-
-
-
-ARM Macro Assembler    Page 11 Alphabetic symbol ordering
-Relocatable symbols
-
       At line 261 in file startup_stm32f407xx.s
 
 SPI2_IRQHandler 0000001A
@@ -1665,6 +1673,12 @@ TIM1_BRK_TIM9_IRQHandler 0000001A
 
 Symbol: TIM1_BRK_TIM9_IRQHandler
    Definitions
+
+
+
+ARM Macro Assembler    Page 12 Alphabetic symbol ordering
+Relocatable symbols
+
       At line 332 in file startup_stm32f407xx.s
    Uses
       At line 102 in file startup_stm32f407xx.s
@@ -1673,12 +1687,6 @@ Symbol: TIM1_BRK_TIM9_IRQHandler
 TIM1_CC_IRQHandler 0000001A
 
 Symbol: TIM1_CC_IRQHandler
-
-
-
-ARM Macro Assembler    Page 12 Alphabetic symbol ordering
-Relocatable symbols
-
    Definitions
       At line 335 in file startup_stm32f407xx.s
    Uses
@@ -1730,6 +1738,12 @@ Symbol: TIM4_IRQHandler
       At line 108 in file startup_stm32f407xx.s
       At line 256 in file startup_stm32f407xx.s
 
+
+
+
+ARM Macro Assembler    Page 13 Alphabetic symbol ordering
+Relocatable symbols
+
 TIM5_IRQHandler 0000001A
 
 Symbol: TIM5_IRQHandler
@@ -1738,12 +1752,6 @@ Symbol: TIM5_IRQHandler
    Uses
       At line 128 in file startup_stm32f407xx.s
       At line 276 in file startup_stm32f407xx.s
-
-
-
-ARM Macro Assembler    Page 13 Alphabetic symbol ordering
-Relocatable symbols
-
 
 TIM6_DAC_IRQHandler 0000001A
 
@@ -1795,6 +1803,12 @@ TIM8_UP_TIM13_IRQHandler 0000001A
 Symbol: TIM8_UP_TIM13_IRQHandler
    Definitions
       At line 352 in file startup_stm32f407xx.s
+
+
+
+ARM Macro Assembler    Page 14 Alphabetic symbol ordering
+Relocatable symbols
+
    Uses
       At line 122 in file startup_stm32f407xx.s
       At line 270 in file startup_stm32f407xx.s
@@ -1803,12 +1817,6 @@ UART4_IRQHandler 0000001A
 
 Symbol: UART4_IRQHandler
    Definitions
-
-
-
-ARM Macro Assembler    Page 14 Alphabetic symbol ordering
-Relocatable symbols
-
       At line 360 in file startup_stm32f407xx.s
    Uses
       At line 130 in file startup_stm32f407xx.s
@@ -1861,18 +1869,18 @@ Symbol: USART6_IRQHandler
 
 UsageFault_Handler 00000010
 
+
+
+ARM Macro Assembler    Page 15 Alphabetic symbol ordering
+Relocatable symbols
+
+
 Symbol: UsageFault_Handler
    Definitions
       At line 202 in file startup_stm32f407xx.s
    Uses
       At line 66 in file startup_stm32f407xx.s
       At line 203 in file startup_stm32f407xx.s
-
-
-
-
-ARM Macro Assembler    Page 15 Alphabetic symbol ordering
-Relocatable symbols
 
 WWDG_IRQHandler 0000001A
 
@@ -1891,7 +1899,7 @@ Symbol: __user_initial_stackheap
    Uses
       At line 408 in file startup_stm32f407xx.s
 Comment: __user_initial_stackheap used once
-94 symbols
+95 symbols
 
 
 
@@ -1956,4 +1964,4 @@ Symbol: __use_two_region_memory
       None
 Comment: __use_two_region_memory unused
 3 symbols
-447 symbols in table
+448 symbols in table

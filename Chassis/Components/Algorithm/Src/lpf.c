@@ -24,6 +24,24 @@
   * @param frame_period: frame perood
   * @retval none
   */
+float sign(float input){
+   return (input>0.0f) - (input<0.0f);
+
+}
+void Tracking_Differentiator_Init(Tracking_Differentiator_Info_TypeDef *TD,float r,float h){
+   TD->Input    = 0; 
+   TD->Output   = 0;
+   TD->d_Output = 0;  
+	 TD->fh = 0;
+   TD->r = r;
+   TD->h = h;
+}
+void Tracking_Differentiator_Update(Tracking_Differentiator_Info_TypeDef *TD,float Input){
+ TD->fh = -TD->r*TD->r*(TD->Output-Input) -2*TD->r*TD->d_Output;
+ TD->Output +=  TD->h* TD->d_Output;
+ TD->d_Output +=  TD->fh * TD->h;
+
+}
 void LowPassFilter1p_Init(LowPassFilter1p_Info_TypeDef *lpf,float alpha,float frame_period)
 {
   lpf->alpha = alpha;

@@ -1,6 +1,6 @@
 .\hal_template\bsp_uart.o: ..\Bsp\Src\bsp_uart.c
 .\hal_template\bsp_uart.o: ../Bsp/Inc/bsp_uart.h
-.\hal_template\bsp_uart.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+.\hal_template\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
 .\hal_template\bsp_uart.o: ../Core/Inc/usart.h
 .\hal_template\bsp_uart.o: ../Core/Inc/main.h
 .\hal_template\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
@@ -17,7 +17,7 @@
 .\hal_template\bsp_uart.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
 .\hal_template\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 .\hal_template\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-.\hal_template\bsp_uart.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
+.\hal_template\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stddef.h
 .\hal_template\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 .\hal_template\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 .\hal_template\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h
@@ -40,7 +40,7 @@
 .\hal_template\bsp_uart.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 .\hal_template\bsp_uart.o: ../Components/Device/Inc/remote_control.h
 .\hal_template\bsp_uart.o: ../Application/Tasks/Inc/config.h
-.\hal_template\bsp_uart.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdbool.h
-.\hal_template\bsp_uart.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
-.\hal_template\bsp_uart.o: D:\MDK5\ARM\ARMCC\Bin\..\include\string.h
-.\hal_template\bsp_uart.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h
+.\hal_template\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdbool.h
+.\hal_template\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
+.\hal_template\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\string.h
+.\hal_template\bsp_uart.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\math.h

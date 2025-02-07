@@ -1,8 +1,8 @@
 .\hal_template\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/timers.c
-.\hal_template\timers.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\hal_template\timers.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
 .\hal_template\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-.\hal_template\timers.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-.\hal_template\timers.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+.\hal_template\timers.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stddef.h
+.\hal_template\timers.o: D:\STM32Pro\MDK5\Core\ARM\ARMCC\Bin\..\include\stdint.h
 .\hal_template\timers.o: ../Core/Inc/FreeRTOSConfig.h
 .\hal_template\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 .\hal_template\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

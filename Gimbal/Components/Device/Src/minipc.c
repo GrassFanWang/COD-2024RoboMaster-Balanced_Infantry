@@ -34,7 +34,7 @@ MiniPC_ReceivePacket_Typedef MiniPC_ReceivePacket = {
  */
 MiniPC_SendPacket_Typedef MiniPC_SendPacket = {
     .header = 0x5A,
-		.detect_color = 1,// 0-red 1-blue
+	  .detect_color = 0,
 };
 
 /**
@@ -56,10 +56,6 @@ void MiniPC_SendFrameInfo(MiniPC_SendPacket_Typedef *SendPacket)
 }
 //------------------------------------------------------------------------------
 
-uint32_t HALTick = 0;
-uint32_t last_HALTick = 0;
-uint32_t Diff_HALTick = 0;
-
 /**
   * @brief  Receive the MiniPC frame Information according the USB CDC
   * @param  Buf: Buffer of data to be received
@@ -68,9 +64,6 @@ uint32_t Diff_HALTick = 0;
   */
 void MiniPC_RecvFrameInfo(uint8_t* Buf, const uint32_t *Len)
 {
-	HALTick = HAL_GetTick();
-	Diff_HALTick = HALTick - last_HALTick;
-	last_HALTick = HALTick;
   /* Judge the crc16 */
   if(verify_CRC16_check_sum(Buf,*Len) != true)
   {

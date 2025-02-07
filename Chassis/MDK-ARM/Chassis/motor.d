@@ -38,8 +38,8 @@
 .\chassis\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 .\chassis\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 .\chassis\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-.\chassis\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h
-.\chassis\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h
-.\chassis\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
 .\chassis\motor.o: ../Components/Controller/Inc/pid.h
 .\chassis\motor.o: ../Bsp/Inc/bsp_can.h
+.\chassis\motor.o: ../Components/Algorithm/Inc/lpf.h
+.\chassis\motor.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
+.\chassis\motor.o: ../Drivers/CMSIS/Include/core_cm4.h

@@ -24,7 +24,6 @@
   * @note turn on:  800
 	*       turn off: 4150
 	*/
-uint16_t Cover_PWM_Compare = 0;
 
 /* USER CODE BEGIN Header_Detect_Task */
 /**
@@ -38,42 +37,12 @@ void Detect_Task(void const * argument)
   /* USER CODE BEGIN Detect_Task */
 //  TickType_t systick = 0;
 	
-	osDelay(50);
+
   /* Infinite loop */
   for(;;)
   {
-//    systick = osKernelSysTick();
 
-    /* cover pwm control */
-    if(Key_R() == false)
-    {
-      Cover_PWM_Compare = 4200;
-    }
-    else
-    {
-      Cover_PWM_Compare = 1250;
-    }
-		
-		if(remote_ctrl.rc.ch[4] == -660)
-		{
-      Cover_PWM_Compare = 1250;
-		}
-		
-    Cover_Control(Cover_PWM_Compare);
-		
-		if(Control_Info.gimbal_mode == GIMBAL_VISION || Control_Info.shoot_mode == SHOOTER_VISION)
-		{
-				LASER_TURN_OFF();
-		}
-		else
-		{
-				LASER_TURN_ON();
-		}
-		
-
-    /* remote control moniter */
-    Remote_Message_Moniter(&remote_ctrl);
-
+   Remote_Message_Moniter(&remote_ctrl); 
     osDelay(5);
   }
   /* USER CODE END Detect_Task */

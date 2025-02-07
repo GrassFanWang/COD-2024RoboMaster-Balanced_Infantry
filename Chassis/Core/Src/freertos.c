@@ -51,7 +51,6 @@ osThreadId StartINSTaskHandle;
 osThreadId StartDetectTaskHandle;
 osThreadId StartControlTasHandle;
 osThreadId StartCANTaskHandle;
-osThreadId StartVMC_TaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -62,9 +61,7 @@ void INS_Task(void const * argument);
 void Detect_Task(void const * argument);
 void Control_Task(void const * argument);
 void CAN_Task(void const * argument);
-void VMC_Task(void const * argument);
 
-extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* GetIdleTaskMemory prototype (linked to static allocation support) */
@@ -126,10 +123,6 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(StartCANTask, CAN_Task, osPriorityRealtime, 0, 256);
   StartCANTaskHandle = osThreadCreate(osThread(StartCANTask), NULL);
 
-  /* definition and creation of StartVMC_Task */
-  osThreadDef(StartVMC_Task, VMC_Task, osPriorityRealtime, 0, 256);
-  StartVMC_TaskHandle = osThreadCreate(osThread(StartVMC_Task), NULL);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -145,8 +138,6 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_INS_Task */
 __weak void INS_Task(void const * argument)
 {
-  /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN INS_Task */
   /* Infinite loop */
   for(;;)
@@ -208,24 +199,6 @@ __weak void CAN_Task(void const * argument)
     osDelay(1);
   }
   /* USER CODE END CAN_Task */
-}
-
-/* USER CODE BEGIN Header_VMC_Task */
-/**
-* @brief Function implementing the StartVMC_Task thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_VMC_Task */
-__weak void VMC_Task(void const * argument)
-{
-  /* USER CODE BEGIN VMC_Task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END VMC_Task */
 }
 
 /* Private application code --------------------------------------------------*/

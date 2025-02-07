@@ -400,9 +400,9 @@ static void BMI088_Offset_Update(BMI088_Info_Typedef *BMI088_Info)
 	
 #else /* DISABLE the BMI088 Calibration */
 	/* store the previous offsets */
-  BMI088_Info->offsets_gyrox = -0.000142103309f;
-  BMI088_Info->offsets_gyroy = -0.00511132634f;
-  BMI088_Info->offsets_gyroz = 0.00104907132f;
+  BMI088_Info->offsets_gyrox = 0.00367089198;
+  BMI088_Info->offsets_gyroy = -0.00339285168;
+  BMI088_Info->offsets_gyroz = 0.00140976941;
 #endif
 
   /* set the offset init flag */

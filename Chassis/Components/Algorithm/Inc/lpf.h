@@ -46,8 +46,21 @@ typedef struct
     float output[3];   /*!< output value */
     float alpha[3];    /*!< filter coefficient */
 }LowPassFilter2p_Info_TypeDef;
-
+typedef struct
+{
+   float Input; //Input signal
+   float r; //Filter coefficient
+   float h; //frame perood  h
+	 float Output; //output value
+   float d_Output; //derivative output value
+   float Err;
+	 float fh;
+}Tracking_Differentiator_Info_TypeDef;	
 /* Exported functions prototypes ---------------------------------------------*/
+extern void Tracking_Differentiator_Init(Tracking_Differentiator_Info_TypeDef *TD,float r,float h);
+
+extern void Tracking_Differentiator_Update(Tracking_Differentiator_Info_TypeDef *TD,float Input);
+
 /**
   * @brief Initializes the first order lowpass filter according to the specified parameters in the
   *         LowPassFilter1p_Info_TypeDef.
@@ -69,4 +82,6 @@ extern void LowPassFilter2p_Init(LowPassFilter2p_Info_TypeDef *lpf,float alpha[3
   */
 extern float LowPassFilter2p_Update(LowPassFilter2p_Info_TypeDef *lpf,float input);
 
+
+extern float sign(float input);
 #endif //LOWPASS_FILTER_H

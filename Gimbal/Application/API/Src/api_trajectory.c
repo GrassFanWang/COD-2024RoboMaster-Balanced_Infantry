@@ -4,8 +4,8 @@
   * @file           : api_trajectory.c
   * @brief          : solve trajectory
   * @author         : Yan Yuanbin
-  * @date           : 2023/05/21
-  * @version        : v1.0
+  * @date           : 2023/07/23
+  * @version        : v2.1
   ******************************************************************************
   * @attention      : see https://github.com/chenjunnn/rm_auto_aim
   ******************************************************************************
@@ -14,6 +14,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "api_trajectory.h"
+#include "bsp_dwt.h"
 #include "math.h"
 #include "arm_math.h"
 #include "config.h"
@@ -35,29 +36,15 @@ static float Trajectory_Picth_Update(float ,float ,SolveTrajectory_Typedef *);
  * @param  SolveTrajectory: pointer to a SolveTrajectory_Typedef structure that
  *          contains the information of solved trajectory.
  * @param  picth: current pitch angle
- * @param  yaw: current yaw amngle 
- * @param  target_yaw: minipc receive target yaw angle
- * @param  v_yaw: minipc receive yaw gyro 
- * @param  r1: minipc received Distance of target center to front and rear armor plates
- * @param  r2: minipc received Distance of target center to armor plates in sides
- * @param  dz: minipc receive unknown
- * @param  armors_num: the num of armor
+ * @param  yaw: current yaw amngle
+ * @param  bullet_speed: bullet speed from Referee
  * @retval none
  */
-void SolveTrajectory_Update(SolveTrajectory_Typedef *SolveTrajectory,float picth,float yaw,float target_yaw,float v_yaw,float r1,float r2,float dz,float bullet_speed,float armors_num)
+void SolveTrajectory_Update(SolveTrajectory_Typedef *SolveTrajectory,float picth,float yaw,float bullet_speed)
 {
     SolveTrajectory->current_pitch = picth;
     SolveTrajectory->current_yaw = yaw;
-    
     SolveTrajectory->bullet_speed = bullet_speed;
-
-    SolveTrajectory->yaw_calc = target_yaw;
-    SolveTrajectory->yawgyro_calc = v_yaw;
-    SolveTrajectory->r1 = r1;
-    SolveTrajectory->r2 = r2;
-    SolveTrajectory->dz = dz;
-
-    SolveTrajectory->armors_num = armors_num;
 }
 //------------------------------------------------------------------------------
 
@@ -65,152 +52,134 @@ void SolveTrajectory_Update(SolveTrajectory_Typedef *SolveTrajectory,float picth
  * @brief  Transform the solve trajectory 
  * @param  bias_time: system delay
  * @param  MiniPCTxData: pointer to a MiniPC_SendPacket_Typedef structure that
-  *          contains the information of transmit Data.
+  *          contains the information of transmit Data to MiniPC.
  * @param  MiniPCRxData: pointer to a MiniPC_ReceivePacket_Typedef structure that
-  *          contains the information of Received Data.
+  *          contains the information of Received Data from MiniPC.
  * @param  SolveTrajectory: pointer to a SolveTrajectory_Typedef structure that
   *          contains the information of solved trajectory.
  * @retval none
- */
+ */    float yaw_diff_offset = 0.f, yaw_diff = 0.f;
+
 void SolveTrajectory_Transform(MiniPC_SendPacket_Typedef *MiniPCTxData,MiniPC_ReceivePacket_Typedef *MiniPCRxData,SolveTrajectory_Typedef *SolveTrajectory)
 {
-    /* calculate the timedelay */
-    float timeDelay = SolveTrajectory->FireSystem_BiasTime + SolveTrajectory->bullet_time;
+    /* Calculate the EC task lency */
+    SolveTrajectory->Task_Lency = DWT_GetTimeline_s() - SolveTrajectory->Task_DWT_Timeline;
 
-    /* calculate the yaw linear prediction */
-    SolveTrajectory->yaw_calc += SolveTrajectory->yawgyro_calc * timeDelay;
+    /* Calculate the x/y coordinates to the armor plate */
+    float x_armor = MiniPCRxData->x - MiniPCRxData->r1*arm_cos_f32(MiniPCRxData->yaw);
+    float y_armor = MiniPCRxData->y - MiniPCRxData->r1*arm_sin_f32(MiniPCRxData->yaw);
+
+    /* Calculate the distance to the armor plate */
+    SolveTrajectory->armor_distance =  sqrt(x_armor*x_armor + y_armor*y_armor);
+
+    /* Calculate the ballistic time */
+    SolveTrajectory->bullet_time = SolveTrajectory->armor_distance/(SolveTrajectory->bullet_speed*arm_cos_f32(SolveTrajectory->current_pitch));
+
+    /* Calculate the system bias time */
+    SolveTrajectory->FireSystem_BiasTime = SolveTrajectory->Task_Lency + SolveTrajectory->bullet_time + SolveTrajectory->Time_Offset;
+
+    /* calculate the predict coordinates */
+    float predict_x = MiniPCRxData->x + MiniPCRxData->vx * SolveTrajectory->FireSystem_BiasTime;
+    float predict_y = MiniPCRxData->y + MiniPCRxData->vy * SolveTrajectory->FireSystem_BiasTime;
+    float predict_yaw = MiniPCRxData->yaw + MiniPCRxData->v_yaw * SolveTrajectory->FireSystem_BiasTime;
+
+    SolveTrajectory->control_status = 0;
+
+
+
+
+/*------------------------------------------------------------------------------------------*/
 	
-		if(SolveTrajectory->yawgyro_calc > 0)
-		{
-			SolveTrajectory->sign_yawgyro = -1;
-		}
-		else
-		{
-			SolveTrajectory->sign_yawgyro = 1;
-		}
+	SolveTrajectory->Center_Lock_Yaw= atan2(MiniPCRxData->y, MiniPCRxData->x);//+SolveTrajectory->Bias_Yaw*DegreesToRadians;
 
-    /* the index of target armor */
-    uint8_t index = 0; 
-    
-    /* yaw diff in algorithm */
-    float yaw_diff_min = 0.f,temp_yaw_diff=0.f;
 
-    /* Judge the armor num,balance armor num is 2 */
-    if (SolveTrajectory->armors_num == 2) 
+    if(fabsf(MiniPCRxData->v_yaw) < 1.5f)
     {
-        for (uint8_t i = 0; i<2; i++) 
-        {
-            SolveTrajectory->target_posure[i].x = MiniPCRxData->x - SolveTrajectory->r1*cos(SolveTrajectory->yaw_calc + SolveTrajectory->sign_yawgyro * i * PI);
-            SolveTrajectory->target_posure[i].y = MiniPCRxData->y - SolveTrajectory->r1*sin(SolveTrajectory->yaw_calc + SolveTrajectory->sign_yawgyro * i * PI);
-            SolveTrajectory->target_posure[i].z = MiniPCRxData->z;
-            SolveTrajectory->target_posure[i].yaw = SolveTrajectory->yaw_calc + i * PI;
-        }
-
-        /* Judge the minimum yaw armor */
-        yaw_diff_min = fabsf(SolveTrajectory->armorlock_yaw - SolveTrajectory->target_posure[0].yaw);
-        temp_yaw_diff= fabsf(SolveTrajectory->armorlock_yaw - SolveTrajectory->target_posure[1].yaw);
-        if (temp_yaw_diff <= yaw_diff_min)
-        {
-            yaw_diff_min = temp_yaw_diff;
-            index = 1;
-        }
+        MiniPCTxData->aim_x = predict_x - MiniPCRxData->r1 * arm_cos_f32(predict_yaw);
+        MiniPCTxData->aim_y = predict_y - MiniPCRxData->r1 * arm_sin_f32(predict_yaw);
+        MiniPCTxData->aim_z = MiniPCRxData->z;
+        /* fire allowed */
+        SolveTrajectory->control_status = 2;
     }
-    /* outpost armor num is 3 */
-    else if (SolveTrajectory->armors_num == 3)
+    else
     {
-        /* store the armor posure */
-        for (uint8_t i = 0; i<3; i++)
-        {
-            SolveTrajectory->target_posure[i].x = MiniPCRxData->x - SolveTrajectory->r2 * cos(SolveTrajectory->yaw_calc + SolveTrajectory->sign_yawgyro * i * 2.f*PI/3.f);
-            SolveTrajectory->target_posure[i].y = MiniPCRxData->y - SolveTrajectory->r2 * sin(SolveTrajectory->yaw_calc + SolveTrajectory->sign_yawgyro * i * 2.f*PI/3.f);
-            SolveTrajectory->target_posure[i].z = MiniPCRxData->z ;
-            SolveTrajectory->target_posure[i].yaw = SolveTrajectory->yaw_calc + i * 2.f*PI/3.f;
-            if(fabsf(SolveTrajectory->target_posure[i].yaw) > 2*PI)
-            {
-                SolveTrajectory->target_posure[i].yaw -= SolveTrajectory->target_posure[i].yaw/fabs(SolveTrajectory->target_posure[i].yaw)*2*PI;
-            }
-        }
-        /* select the minimum yaw armor */
-        yaw_diff_min = fabsf(SolveTrajectory->centerlock_yaw  - SolveTrajectory->target_posure[0].yaw);
-        for (uint8_t i = 1; i<3; i++) 
-        {
-            temp_yaw_diff = fabsf(SolveTrajectory->centerlock_yaw  - SolveTrajectory->target_posure[i].yaw);
-            if (temp_yaw_diff <= yaw_diff_min)
-            {
-                yaw_diff_min = temp_yaw_diff;
-                index = i;
-            }
-        }
-    }
-    /* normal armor num is 4 */
-    else if (SolveTrajectory->armors_num == 4)
-    {
-        /* select the armor flag */
-        bool use_1 = 1;
+        bool is_armor_pair = true;
+        float r = 0;
+/*------------------------------------------------------------------------------------------*/
 
-        /* store the armor posure */
-        for (uint8_t i = 0; i<4; i++)
-        {
-            float r = use_1 ? SolveTrajectory->r1 : SolveTrajectory->r2;
-            SolveTrajectory->target_posure[i].x = MiniPCRxData->x - r*cos(SolveTrajectory->yaw_calc + SolveTrajectory->sign_yawgyro * i * PI/2.f);
-            SolveTrajectory->target_posure[i].y = MiniPCRxData->y - r*sin(SolveTrajectory->yaw_calc + SolveTrajectory->sign_yawgyro * i * PI/2.f);
-            SolveTrajectory->target_posure[i].z = use_1 ? MiniPCRxData->z : (MiniPCRxData->z + SolveTrajectory->dz);
-            SolveTrajectory->target_posure[i].yaw = SolveTrajectory->yaw_calc + i * PI/2.f;
-            if(fabsf(SolveTrajectory->target_posure[i].yaw) > 2*PI)
-            {
-                SolveTrajectory->target_posure[i].yaw -= SolveTrajectory->target_posure[i].yaw/fabs(SolveTrajectory->target_posure[i].yaw)*2*PI;
-            }
-            use_1 = !use_1;
-        }
-
-#if Yaw_Distance_Decision
-        /* select the minimum distance armor */
-        float dis_diff_min = 0.f,temp_dis_diff = 0.f;
-        arm_sqrt_f32(SolveTrajectory->target_posure[0].x * SolveTrajectory->target_posure[0].x + SolveTrajectory->target_posure[0].y * SolveTrajectory->target_posure[0].y,&dis_diff_min);
-        for (uint8_t i = 1; i<4; i++)
-        {
-            arm_sqrt_f32(SolveTrajectory->target_posure[i].x * SolveTrajectory->target_posure[i].x + SolveTrajectory->target_posure[i].y * SolveTrajectory->target_posure[i].y,&temp_dis_diff);
-            if (temp_dis_diff <= dis_diff_min)
-            {
-                dis_diff_min = temp_dis_diff;
-                index = i;
-            }
-        }
-#else
-        /* select the minimum yaw armor */
-        yaw_diff_min = fabsf(SolveTrajectory->centerlock_yaw - SolveTrajectory->target_posure[0].yaw);
-        for (uint8_t i = 1; i<4; i++) 
-        {
-            temp_yaw_diff = fabsf(SolveTrajectory->centerlock_yaw - SolveTrajectory->target_posure[i].yaw);
-            if (temp_yaw_diff <= yaw_diff_min)
-            {
-                yaw_diff_min = temp_yaw_diff;
-                index = i;
-            }
-        }
-#endif
-    }
-
-    /* store the predicted position */
-    MiniPCTxData->aim_x = SolveTrajectory->target_posure[index].x + MiniPCRxData->vx * timeDelay;
-    MiniPCTxData->aim_y = SolveTrajectory->target_posure[index].y + MiniPCRxData->vy * timeDelay;
-    MiniPCTxData->aim_z = SolveTrajectory->target_posure[index].z + MiniPCRxData->vz * timeDelay;
+        float center_yaw = atan2(predict_y, predict_x);//+SolveTrajectory->Bias_Yaw*DegreesToRadians;
 		
-    /* calculate the distance to armor */
-    arm_sqrt_f32((MiniPCTxData->aim_x) * (MiniPCTxData->aim_x) + (MiniPCTxData->aim_y) * (MiniPCTxData->aim_y),&SolveTrajectory->armor_distance);
+        /* select the aromor plate */
+        for (uint8_t i = 0; i < MiniPCRxData->armors_num; i++) 
+        {
+            /* calculate the predict yaw angle to the all aromor plate in turn */
+            float tmp_yaw = MiniPCRxData->v_yaw < 0 ? (predict_yaw - i * (2.f * PI / MiniPCRxData->armors_num)) : (predict_yaw + i * (2.f * PI / MiniPCRxData->armors_num));
+        
+            /* calculate the yaw angle diff */
+            yaw_diff = fabsf(tmp_yaw - center_yaw) > PI ? ((tmp_yaw - center_yaw) - (tmp_yaw - center_yaw)/fabsf(tmp_yaw - center_yaw)*2*PI) : (tmp_yaw - center_yaw);
+			
+            /* take the threshold offset according to the direction of the yaw angular velocity */
+            yaw_diff_offset = MiniPCRxData->v_yaw < 0 ? -SolveTrajectory->Armor_Yaw_Limit_Offset : SolveTrajectory->Armor_Yaw_Limit_Offset;
 
-    /* calculate the gimbal target posture,lock the armor */
-    SolveTrajectory->armorlock_pitch = Trajectory_Picth_Update( SolveTrajectory->armor_distance - SolveTrajectory->Camera_Muzzle_horizontal,
-                                    SolveTrajectory->target_posure[index].z + SolveTrajectory->Camera_Muzzle_vertical, SolveTrajectory);
-    SolveTrajectory->armorlock_yaw = (float)(atan2(MiniPCTxData->aim_y, MiniPCTxData->aim_x));
+            if (-SolveTrajectory->Armor_Yaw_Limit + yaw_diff_offset < yaw_diff && yaw_diff < SolveTrajectory->Armor_Yaw_Limit + yaw_diff_offset) 
+            {
+                /* Only 4 armors has 2 radius and height */
+                if (MiniPCRxData->armors_num == 4) 
+                {
+                    r = is_armor_pair ? MiniPCRxData->r1 :  MiniPCRxData->r2;
+                    MiniPCTxData->aim_z = MiniPCRxData->z + (is_armor_pair ? 0 : MiniPCRxData->dz);
+                }
+                else
+                {
+                    r = MiniPCRxData->r1;
+                    MiniPCTxData->aim_z = MiniPCRxData->z;
+                }
 
-    /* calculate the distance to center */
-    arm_sqrt_f32((MiniPCRxData->x) * (MiniPCRxData->x) + (MiniPCRxData->y) * (MiniPCRxData->y),&SolveTrajectory->center_distance);
+                /* Convert to predicted armor plate coordinates */
+                MiniPCTxData->aim_x = predict_x - r * arm_cos_f32(tmp_yaw);
+                MiniPCTxData->aim_y = predict_y - r * arm_sin_f32(tmp_yaw);
 
-    /* calculate the gimbal target posture,lock the center */
-    SolveTrajectory->centerlock_pitch = Trajectory_Picth_Update( SolveTrajectory->center_distance - SolveTrajectory->Camera_Muzzle_horizontal,
-                                    MiniPCRxData->z + SolveTrajectory->Camera_Muzzle_vertical, SolveTrajectory);
-    SolveTrajectory->centerlock_yaw = (float)(atan2(MiniPCRxData->y, MiniPCRxData->x));
+                SolveTrajectory->control_status = 1;
+
+                break;
+            }
+            is_armor_pair = !is_armor_pair;
+        }
+    }
+
+    float ALLOW_ERROR_DISTANCE = 0.f, min_yaw_diff = 0.f, allow_error_angle = 0.f;
+
+    if (SolveTrajectory->control_status != 0) 
+    {
+        /* Calculate gimbal command */
+        SolveTrajectory->armorlock_pitch = Trajectory_Picth_Update(SolveTrajectory->armor_distance+SolveTrajectory->Camera_Yaw_Horizontal,MiniPCTxData->aim_z+SolveTrajectory->Camera_Yaw_Vertical,SolveTrajectory);
+        SolveTrajectory->armorlock_yaw = atan2(MiniPCTxData->aim_y, MiniPCTxData->aim_x);
+
+        /* Fire control */
+        if (SolveTrajectory->control_status == 1) 
+        {
+            /* balance/hero(large armor plate) : other(small armor plate) */
+            ALLOW_ERROR_DISTANCE = (MiniPCRxData->armors_num == 2 || MiniPCRxData->id == 1) ? LargeArmor_HalfWidth : LittleArmor_HalfWidth;
+
+            /* Scale threshold based on distance */
+            allow_error_angle =  atan2f(SolveTrajectory->armor_distance,ALLOW_ERROR_DISTANCE);
+
+            /* calculate the yaw angle diff */
+/*------------------------------------------------------------------------------------------*/
+            yaw_diff = SolveTrajectory->armorlock_yaw-SolveTrajectory->current_yaw;//+SolveTrajectory->Bias_Yaw*DegreesToRadians;
+
+
+            /* calculate the Minimum absolute yaw angle diff */
+            min_yaw_diff = fabsf(yaw_diff) > PI ? ( yaw_diff/fabsf(yaw_diff)*2*PI - yaw_diff ) : (yaw_diff);
+
+            if (fabsf(min_yaw_diff) < allow_error_angle) 
+            {
+                SolveTrajectory->control_status = 2;
+            }
+        }
+    }
+    /* update the task DWT timeline */
+    SolveTrajectory->Task_DWT_Timeline = DWT_GetTimeline_s();
 }
 //------------------------------------------------------------------------------
 
@@ -227,13 +196,13 @@ void SolveTrajectory_Transform(MiniPC_SendPacket_Typedef *MiniPCTxData,MiniPC_Re
  */
 static float Trajectory_BulletModel(float distance,float bullet_k,float bullet_speed,float *bullet_Time,float pitchangle)
 {
-    float Height = 0.f;
+    float height = 0.f;
 
     *bullet_Time = (float)((exp(bullet_k * distance)- 1.f) / (bullet_k * bullet_speed * cos(pitchangle)));
 
-    Height = (float)(bullet_speed * arm_sin_f32(pitchangle) * *bullet_Time - GravityAccel * *bullet_Time * *bullet_Time / 2.f);
+    height = (float)(bullet_speed * arm_sin_f32(pitchangle) * *bullet_Time - GravityAccel * *bullet_Time * *bullet_Time / 2.f);
 
-    return Height;
+    return height;
 }
 //------------------------------------------------------------------------------
 
@@ -248,7 +217,7 @@ static float Trajectory_BulletModel(float distance,float bullet_k,float bullet_s
 static float Trajectory_Picth_Update(float distance,float height,SolveTrajectory_Typedef *SolveTrajectory)
 {
     float z_temp = 0.f,dz = 0.f;
-    float Height_calc = 0.f,pitchangle = 0.f;
+    float height_calc = 0.f,pitchangle = 0.f;
 
     /* store the height of target armor */
     z_temp = height;
@@ -260,10 +229,10 @@ static float Trajectory_Picth_Update(float distance,float height,SolveTrajectory
         pitchangle = (float)atan2(z_temp,distance);
 
         /* Calculate the Bullet Model offset */
-        Height_calc = Trajectory_BulletModel(distance,Bullet_Coefficient,SolveTrajectory->bullet_speed,&SolveTrajectory->bullet_time,pitchangle);
+        height_calc = Trajectory_BulletModel(distance,Bullet_Coefficient,SolveTrajectory->bullet_speed,&SolveTrajectory->bullet_time,pitchangle);
 
         /* calculate the difference of height */
-        dz = 0.3f*(height - Height_calc);
+        dz = 0.3f*(height - height_calc);
         
         /* height points compensation */
         z_temp += dz;

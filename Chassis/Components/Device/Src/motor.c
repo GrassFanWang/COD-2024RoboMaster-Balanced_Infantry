@@ -15,99 +15,62 @@
 /* Includes ------------------------------------------------------------------*/
 #include "motor.h"
 #include "bsp_can.h"
-RMD_L9025_Info_Typedef RMD_Motor[RMD_MOTOR_USAGE_NUM]=
+#include "lpf.h"
+#include "arm_math.h"
+#include "math.h"
+LK_L9025_Info_Typedef LK_Motor[LK_MOTOR_USAGE_NUM]=
 {
 	[Left_Wheel]=
 	{
-		.Type = RMD_L9025,
-		.CANFrame.RxStdId = 0x241,
+		.Type = LK_L9025,
+		.CANFrame.RxStdId = 0x141,
+		.lost = 1,
 	},
 	[Right_Wheel]=
 	{
-		.Type = RMD_L9025,
-		.CANFrame.RxStdId = 0x242, 
+		.Type = LK_L9025,
+		.CANFrame.RxStdId = 0x142, 
+		.lost = 1,
 	},
 };
 
-DJI_Motor_Info_Typedef DJI_Motor[DJI_MOTOR_USAGE_NUM]=
+DJI_Motor_Info_Typedef DJI_Yaw_Motor =
 {
-	[Left_Momentum]=
-	{
-		.Type = DJI_GM6020,
-		.CANFrame.RxStdId = 0x205,
-	},
-	[Right_Momentum]=
-	{
-		.Type = DJI_GM6020,
+	  .Type = DJI_GM6020,
 		.CANFrame.RxStdId = 0x206,
-	},
-	[Yaw]=
-	{
-		.Type = DJI_GM6020,
-		.CANFrame.RxStdId = 0x205,
-	},
+    .lost = 1,
+
 };
  
  Damiao_Motor_Info_Typedef Damiao_Motor[Damiao_MOTOR_USAGE_NUM]=
 {
-    [Left_Anterior_Joint]=
+    [L_A_Joint]=
 	  {
 		  .CANFrame.TxStdId = 0x01,
-			.CANFrame.RxStdId = 0x01
+			.CANFrame.RxStdId = 0x01,
+			.lost = 1,
 		},
-    [Left_Posterior_Joint]=
+    [L_P_Joint]=
 		{
 		   .CANFrame.TxStdId = 0x02,
 			 .CANFrame.RxStdId = 0x02,
+			 .lost = 1,
 		},
-		[Right_Anterior_Joint]=
+		[R_A_Joint]=
 		{
 		   .CANFrame.TxStdId = 0x03,
 			 .CANFrame.RxStdId = 0x03,
+			 .lost = 1,
 		},
-		[Right_Posterior_Joint]=
+		[R_P_Joint]=
 		{
 			 .CANFrame.RxStdId = 0x04,
 		   .CANFrame.TxStdId = 0x04,
+			 .lost = 1,
 		},
 };
-Damiao_Motor_Contorl_Info_Typedef Damiao_Motor_Contorl_Info[4]={
-	[Left_Anterior_Joint]={
-   .Position = 0,
-	 .Velocity =0,
-	 .KP =0,
-	 .KD =1,
-	 .Torque=0,
-	 .Angle = 0,
-	},
-	[Left_Posterior_Joint]={
-   .Position = 0,
-	 .Velocity =0,
-	 .KP =0,
-	 .KD =1,
-	 .Torque=0,
-	 .Angle = 0,
-	},
-		[Right_Anterior_Joint]={
-   .Position = 0,
-	 .Velocity =0,
-	 .KP =0,
-	 .KD =1,
-	 .Torque=0,
-	 .Angle = 0,
-	},
-		[Right_Posterior_Joint]={
-   .Position = 0,
-	 .Velocity =0,
-	 .KP =0,
-	 .KD =1,
-	 .Torque=0,
-	 .Angle = 0,
-	},
-};
 
- uint8_t DamiaoMotorAble_FramInfo[8];
- uint8_t DamiaoMotor2Able_FramInfo[8];
+
 
 //};
 /* Private function prototypes -----------------------------------------------*/
@@ -123,10 +86,10 @@ float encoder_to_angle(Motor_GeneralInfo_Typedef *,float ,uint16_t );
   * @brief  Judge the DJI Motor state
   */
 static float uint_to_float(int X_int, float X_min, float X_max, int Bits);
+static int float_to_uint(float x, float x_min, float x_max, int bits);
 
 static void DJI_Motor_ErrorHandler(DJI_Motor_Info_Typedef *);
 
-static void Damiao_Motor_ErrorHandler(Damiao_Motor_Info_Typedef *Damiao_Motor);
 /**
   * @brief  Update the DJI motor Information
   * @param  StdId  pointer to the specifies the standard identifier.
@@ -147,7 +110,8 @@ void DJI_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,DJI_Motor_Info_Typede
 	DJI_Motor->Data.current  = ((int16_t)rxBuf[4] << 8 | (int16_t)rxBuf[5]);
 	/* Judge the motor error	*/
 	DJI_Motor_ErrorHandler(DJI_Motor);
-
+  DJI_Motor->Online_cnt = 250;
+	DJI_Motor->lost = 0;
   /* update the txframe id and index */
   if(DJI_Motor->Data.Initlized != true)
   {
@@ -167,7 +131,9 @@ void DJI_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,DJI_Motor_Info_Typede
 	switch(DJI_Motor->Type)
 	{
 		case DJI_GM6020:
-			DJI_Motor->Data.angle = encoder_to_anglesum(&DJI_Motor->Data,1.f,8192);
+	
+		
+		DJI_Motor->Data.angle = encoder_to_angle(&DJI_Motor->Data,1.f,8192);
 		break;
 	
 		case DJI_M3508:
@@ -186,7 +152,7 @@ void DJI_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,DJI_Motor_Info_Typede
   * @brief  Update the Damiao motor Information
   * @param  StdId  pointer to the specifies the standard identifier.
   * @param  rxBuf  pointer to the can receive data
-  * @param  RMD_Motor pointer to a RMD_L9025_Info_Typedef structure that contains the information of RMD motor
+  * @param  LK_Motor pointer to a LK_L9025_Info_Typedef structure that contains the information of LK motor
   * @retval None
   */
 void Damiao_Motor_Info_Update(uint8_t *rxBuf,Damiao_Motor_Info_Typedef *Damiao_Motor)
@@ -200,81 +166,40 @@ void Damiao_Motor_Info_Update(uint8_t *rxBuf,Damiao_Motor_Info_Typedef *Damiao_M
 		Damiao_Motor->Data.T_int = ((uint16_t)(rxBuf[4]&0xF) <<8) | ((uint16_t)(rxBuf[5]));
 		Damiao_Motor->Data.Torque=  uint_to_float(Damiao_Motor->Data.T_int,-45,45,12);
 		Damiao_Motor->Data.Position=uint_to_float(Damiao_Motor->Data.P_int,-3.141593,3.141593,16);
-		Damiao_Motor->Data.Velocity=uint_to_float(Damiao_Motor->Data.V_int,-50,50,12);
-   	if(fabs(Damiao_Motor->Data.Velocity)<0.015) Damiao_Motor->Data.Velocity = 0;
-		Damiao_Motor->Data.Temperature_MOS   = (float)(rxBuf[6]);
+    Damiao_Motor->Data.Velocity=uint_to_float(Damiao_Motor->Data.V_int,-50,50,12);
+
+    Damiao_Motor->Data.Temperature_MOS   = (float)(rxBuf[6]);
 		Damiao_Motor->Data.Temperature_Rotor = (float)(rxBuf[7]);
-		Damiao_Motor->Data.Angle =  Damiao_Motor->Data.Position*Rad_to_angle;
-  if(Damiao_Motor->Data.Initlized ==0) {
-	  Damiao_Motor_Contorl_Info[ Damiao_Motor->ID -1].Angle = Damiao_Motor->Data.Angle;
-	  Damiao_Motor->Data.Initlized = 1;
-	 }
-	if(Damiao_Motor->Data.State!=0){
-   Damiao_Motor_ErrorHandler(Damiao_Motor);
-	}
-}
-void Damiao_Motor_Enable(uint8_t ID){
-	 uint8_t Motor_ID =ID-1;
-   JointTxFrame[Motor_ID].Data[0] = 0xFF;
-   JointTxFrame[Motor_ID].Data[1] = 0xFF;
-   JointTxFrame[Motor_ID].Data[2] = 0xFF;
-   JointTxFrame[Motor_ID].Data[3] = 0xFF;
-   JointTxFrame[Motor_ID].Data[4] = 0xFF;
-   JointTxFrame[Motor_ID].Data[5] = 0xFF;
-   JointTxFrame[Motor_ID].Data[6] = 0xFF;
-	 JointTxFrame[Motor_ID].Data[7] = 0xFC;
-	 USER_CAN_TxMessage(&JointTxFrame[Motor_ID]);
+	  Damiao_Motor->Online_cnt = 250;
+	  Damiao_Motor->lost = 0;
+
 }
 
-void Damiao_Motor_DisEnable(uint8_t ID){
-	 uint8_t Motor_ID =ID-1;
-   JointTxFrame[Motor_ID].Data[0] = 0xFF;
-   JointTxFrame[Motor_ID].Data[1] = 0xFF;
-   JointTxFrame[Motor_ID].Data[2] = 0xFF;
-   JointTxFrame[Motor_ID].Data[3] = 0xFF;
-   JointTxFrame[Motor_ID].Data[4] = 0xFF;
-   JointTxFrame[Motor_ID].Data[5] = 0xFF;
-   JointTxFrame[Motor_ID].Data[6] = 0xFF;
-	 JointTxFrame[Motor_ID].Data[7] = 0xFD;
-	 USER_CAN_TxMessage(&JointTxFrame[Motor_ID]);
-}
+
+
 /**
-  * @brief  Update the RMD motor Information
+  * @brief  Update the LK motor Information
   * @param  StdId  pointer to the specifies the standard identifier.
   * @param  rxBuf  pointer to the can receive data
-  * @param  RMD_Motor pointer to a RMD_L9025_Info_Typedef structure that contains the information of RMD motor
+  * @param  LK_Motor pointer to a LK_L9025_Info_Typedef structure that contains the information of LK motor
   * @retval None
   */
-void RMD_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,RMD_L9025_Info_Typedef *RMD_Motor)
+void LK_Motor_Info_Update(uint32_t *StdId, uint8_t *rxBuf,LK_L9025_Info_Typedef *LK_Motor)
 {
 	/* Judge the StdId */
-	if(*StdId != RMD_Motor->CANFrame.RxStdId)
+	if(*StdId != LK_Motor->CANFrame.RxStdId)
   {
     return;
   }
 
-  /* Update the receive order */
-	RMD_Motor->order = rxBuf[0];
-	
-	/* transforms the  general motor data */
-	RMD_Motor->Data.Temperature = rxBuf[1];
-	RMD_Motor->Data.Current  = ((int16_t)(rxBuf[2]) | (int16_t)(rxBuf[3]<<8));
-	RMD_Motor->Data.Velocity = ((int16_t)(rxBuf[4]) | (int16_t)(rxBuf[5]<<8));
-	RMD_Motor->Data.Rad_Velocity =  RMD_Motor->Data.Velocity * Angle_to_rad;
-	RMD_Motor->Data.Angle  = ((int16_t)(rxBuf[6]) | (int16_t)(rxBuf[7]<<8));
-//  if(RMD_Motor->Data.angle>=180){
-//		RMD_Motor->Data.angle -= 360;
-//	}
-	//if(RMD_Motor->Data.angle<=-180) RMD_Motor->Data.angle = RMD_Motor->Data.angle + 360;
-	/* transform the encoder to anglesum */
-//	switch(RMD_Motor->Type)
-//  {
-//    case RMD_L9025:
-//      RMD_Motor->Data.angle = encoder_to_anglesum(&RMD_Motor->Data,1.f,32768);
-//    break;
-
-//    default:break;
-//  }
+	   LK_Motor->Data.Temperature = rxBuf[1];
+	   LK_Motor->Data.Current  = ((int16_t)(rxBuf[2]) | (int16_t)(rxBuf[3]<<8));
+	   LK_Motor->Data.Velocity = ((int16_t)(rxBuf[4]) | (int16_t)(rxBuf[5]<<8));
+	   LK_Motor->Data.Rad_Velocity = LK_Motor->Data.Velocity*Angle_to_rad;
+	   LK_Motor->Data.Encoder  =   ((int16_t)(rxBuf[6]) | (int16_t)(rxBuf[7]<<8));
+     LK_Motor->Online_cnt = 250;
+	   LK_Motor->lost = 0;
+ 
 }
 //------------------------------------------------------------------------------
 
@@ -384,7 +309,7 @@ float encoder_to_angle(Motor_GeneralInfo_Typedef *Info,float torque_ratio,uint16
     Info->last_encoder = Info->encoder;
 
     /* reset the angle */
-    Info->angle = 0;
+    Info->angle = Info->encoder/(MAXencoder*torque_ratio)*360.f;
 
     /* config the init flag */
     Info->Initlized = true;
@@ -441,12 +366,50 @@ static void DJI_Motor_ErrorHandler(DJI_Motor_Info_Typedef *DJI_Motor)
     DJI_Motor->ERRORHandler.ErrorCount = 0;	
 	}
 }
-static void Damiao_Motor_ErrorHandler(Damiao_Motor_Info_Typedef *Damiao_Motor)
-{
-	Damiao_Motor->ERRORHandler.ErrorCount++;
-  if(	Damiao_Motor->ERRORHandler.ErrorCount>200){
-	 Damiao_Motor_DisEnable(Damiao_Motor->CANFrame.TxStdId);
-	}
+
+void Damiao_Motor_Enable(uint8_t ID){
+	 uint8_t Motor_ID =ID-1;
+   JointTxFrame[Motor_ID].Data[0] = 0xFF;
+   JointTxFrame[Motor_ID].Data[1] = 0xFF;
+   JointTxFrame[Motor_ID].Data[2] = 0xFF;
+   JointTxFrame[Motor_ID].Data[3] = 0xFF;
+   JointTxFrame[Motor_ID].Data[4] = 0xFF;
+   JointTxFrame[Motor_ID].Data[5] = 0xFF;
+   JointTxFrame[Motor_ID].Data[6] = 0xFF;
+	 JointTxFrame[Motor_ID].Data[7] = 0xFC;
+	 USER_CAN_TxMessage(&JointTxFrame[Motor_ID]);
+}
+
+ void Damiao_Motor_DisEnable(uint8_t ID){
+	 uint8_t Motor_ID =ID-1;
+   JointTxFrame[Motor_ID].Data[0] = 0xFF;
+   JointTxFrame[Motor_ID].Data[1] = 0xFF;
+   JointTxFrame[Motor_ID].Data[2] = 0xFF;
+   JointTxFrame[Motor_ID].Data[3] = 0xFF;
+   JointTxFrame[Motor_ID].Data[4] = 0xFF;
+   JointTxFrame[Motor_ID].Data[5] = 0xFF;
+   JointTxFrame[Motor_ID].Data[6] = 0xFF;
+	 JointTxFrame[Motor_ID].Data[7] = 0xFD;
+	 USER_CAN_TxMessage(&JointTxFrame[Motor_ID]);
+}
+ 
+void Damiao_Motor_CAN_Send(uint8_t ID,float Postion, float Velocity, float KP, float KD, float Torque){
+   static uint16_t Postion_Tmp,Velocity_Tmp,Torque_Tmp,KP_Tmp,KD_Tmp;
+	 uint8_t Motor_ID = ID-1;
+   Postion_Tmp  =  float_to_uint(Postion,-3.141593f,3.141593f,16) ;
+   Velocity_Tmp =  float_to_uint(Velocity,-50,50,12);
+	 KP_Tmp = float_to_uint(KP,0,500,12);
+	 KD_Tmp = float_to_uint(KD,0,5,12);
+   Torque_Tmp = float_to_uint(Torque,-45,45,12);
+	 JointTxFrame[Motor_ID].Data[0] = (uint8_t)(Postion_Tmp>>8);
+	 JointTxFrame[Motor_ID].Data[1] = (uint8_t)(Postion_Tmp);
+	 JointTxFrame[Motor_ID].Data[2] = (uint8_t)(Velocity_Tmp>>4);
+	 JointTxFrame[Motor_ID].Data[3] = (uint8_t)((Velocity_Tmp&0x0F)<<4) | (uint8_t)(KP_Tmp>>8);
+	 JointTxFrame[Motor_ID].Data[4] = (uint8_t)(KP_Tmp);
+	 JointTxFrame[Motor_ID].Data[5] = (uint8_t)(KD_Tmp>>4);
+	 JointTxFrame[Motor_ID].Data[6] = (uint8_t)((KD_Tmp&0x0F)<<4) | (uint8_t)(Torque_Tmp>>8);
+	 JointTxFrame[Motor_ID].Data[7] = (uint8_t)(Torque_Tmp);
+   USER_CAN_TxMessage(&JointTxFrame[Motor_ID]);
 }
 //------------------------------------------------------------------------------
 static float uint_to_float(int X_int, float X_min, float X_max, int Bits){
@@ -455,16 +418,12 @@ static float uint_to_float(int X_int, float X_min, float X_max, int Bits){
     float offset = X_min;
     return ((float)X_int)*span/((float)((1<<Bits)-1)) + offset;
 }
-//static float Damiao_Motor_Postion_to_Angle(float Position){
-//    if(Position>=0&&Position<=12.5) return (Position/12.5f*9)*180;
-//	  else if(Position<0&&Position>=-12.5)  return (Position/12.5f*9)*180
 
-
-
-
-//}
-
-
+static int float_to_uint(float x, float x_min, float x_max, int bits){
+    float span = x_max - x_min;
+    float offset = x_min;
+    return (int) ((x-offset)*((float)((1<<bits)-1))/span);
+}
 
 
 

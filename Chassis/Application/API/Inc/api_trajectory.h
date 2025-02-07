@@ -24,54 +24,51 @@
 /* Exported defines -----------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
-/**
- * @brief typedef structure that contains the information for the target armor posure.
- */
-typedef struct 
-{
-    float x;       /*!< x in the ros coordinate system */
-    float y;       /*!< y in the ros coordinate system */
-    float z;       /*!< z in the ros coordinate system */
-    float yaw;     /*!< target yaw angle */
-}TargetArmor_Posure;
 
 /**
  * @brief typedef structure that contains the information for the solved trajectory.
  */
 typedef struct
 {
-    float Camera_Muzzle_vertical;    /*!< the vertical distance of yaw axis to the muzzle(m) */
-    float Camera_Muzzle_horizontal;  /*!< the horizontal distance of yaw axis to the muzzle(m) */
-    float FireSystem_BiasTime;       /*!< the bias time of system(s), contains the communication delay and trigger delay */
+    float Camera_Yaw_Vertical;    /*!< the vertical distance of yaw axis to the camera(m) */
+    float Camera_Yaw_Horizontal;  /*!< the horizontal distance of yaw axis to the camera(m) */
+
+    float Time_Offset;            /*!< the bias time of communication(s) and trigger(s) etc. from user estimating */
+    float Task_DWT_Timeline;      /*!< the DWT time line of EC task(s) */
+    float Task_Lency;             /*!< the bias time of EC task(s) */
+    float bullet_time;            /*!< ballistic time */
+    float FireSystem_BiasTime;    /*!< the bias time of system(s), contains the communication delay, task delay and trigger delay etc. */
+
+    float armor_distance;  /*!< distance to the armor plate */
 
     float bullet_speed;   /*!< referee bullet speed */
-    float bullet_time;    /*!< ballistic time */
+    
     float current_pitch;  /*!< current pitch angle */
     float current_yaw;    /*!< current yaw angle */
 
-    float yaw_calc;       /*!< yaw angle in algorithm */
-    float yawgyro_calc;   /*!< yaw gyro in algorithm */
-    float r1;             /*!< Distance of target center to front and rear armor plates */
-    float r2;             /*!< Distance of target center to armor plates in sides */
-    float dz;             /*!< unknown */
-    uint8_t armors_num;   /*!< the num of armor */
+    float Armor_Yaw_Limit;          /* the yaw angle diff threshold */
+    float Armor_Yaw_Limit_Offset;   /* the offset of yaw angle diff threshold */  
 
-    float armorlock_yaw;      /*!< gimbal target yaw angle,lock the armor */
-    float armorlock_pitch;    /*!< gimbal target pitch angle,lock the armor  */
-    float centerlock_pitch;    /*!< gimbal target pitch angle,lock the center  */
-    float centerlock_yaw;      /*!< gimbal target yaw angle,lock the center */
+    float armorlock_yaw;      /*!< gimbal target yaw angle in radians,lock the armor */
+    float armorlock_pitch;    /*!< gimbal target pitch angle in radians,lock the armor  */
+	
+	
+	float Bias_Yaw;
+	float Bias_Pitch;
+	
+	float Center_Lock_Yaw;
 
-    float armor_distance;
-    float center_distance;
 
-    TargetArmor_Posure target_posure[4];    /* target armor posure */
+    uint8_t control_status;   /*!< vision control status */
+    
 }SolveTrajectory_Typedef;
 
 /* Exported functions prototypes ---------------------------------------------*/
 /**
  * @brief  Update the solve trajectory 
  */
-extern void SolveTrajectory_Update(SolveTrajectory_Typedef *SolveTrajectory,float picth,float yaw,float target_yaw,float v_yaw,float r1,float r2,float dz,float bullet_speed,float armors_num);
+extern void SolveTrajectory_Update(SolveTrajectory_Typedef *SolveTrajectory,float picth,float yaw,float bullet_speed);
+
 /**
  * @brief  Transform the solve trajectory 
  */
